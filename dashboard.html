@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoBúzios — Painel de Alunos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --orange:      #C87830;
+      --orange-light:#E8944A;
+      --orange-dim:  #7A4A1A;
+      --teal:        #1E6B70;
+      --teal-light:  #2A8E95;
+      --teal-dim:    #0D3A3D;
+      --bg:          #0B1A1B;
+      --surface:     #112224;
+      --surface2:    #172E30;
+      --border:      #1E3E40;
+      --text:        #E8F0F0;
+      --muted:       #7A9E9F;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--teal-dim) 0%, #0B1A1B 60%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      height: 80px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-wrap img {
+      height: 52px;
+      filter: drop-shadow(0 2px 12px rgba(200,120,48,.35));
+    }
+
+    .logo-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--border);
+    }
+
+    .logo-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .logo-label strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(30,107,112,.25);
+      color: #5ECDD3;
+      border: 1px solid rgba(30,107,112,.6);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .badge::before {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #5ECDD3;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    .timestamp { font-size: 0.75rem; color: var(--muted); }
+
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 36px 24px 48px;
+    }
+
+    /* ── KPIs ── */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .kpi:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.3);
+    }
+    .kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--accent, var(--teal));
+    }
+    .kpi::after {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: var(--accent, var(--teal));
+      opacity: .06;
+    }
+    .kpi .icon { font-size: 1.5rem; margin-bottom: 14px; display: block; }
+    .kpi .label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .kpi .value {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .kpi .sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--orange);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── CHARTS GRID ── */
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: box-shadow .2s;
+    }
+    .card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.25); }
+
+    .card h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h2 span { font-size: 1rem; }
+
+    .chart-wrap {
+      position: relative;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── BAR LIST ── */
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-item { display: flex; flex-direction: column; gap: 5px; }
+    .bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #CBD5D5;
+    }
+    .bar-count { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+    .bar-track {
+      background: var(--teal-dim);
+      border-radius: 6px;
+      height: 9px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 1s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── LOADING ── */
+    #loading { text-align: center; padding: 100px 0; color: var(--muted); }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.73rem;
+      color: #1E3E40;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <img src="logo%20EcoBuzios.png" alt="EcoBúzios" />
+    <div class="logo-divider"></div>
+    <div class="logo-label">
+      <strong>Painel de Alunos</strong>
+      Dados em tempo real
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge" id="status-badge">Carregando…</span>
+    <span class="timestamp" id="timestamp"></span>
+  </div>
+</header>
+
+
+<main>
+  <div id="loading">
+    <div class="spinner"></div>
+    Buscando dados da API…
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="section-label">Indicadores principais</div>
+    <div class="kpis" id="kpis"></div>
+
+    <div class="section-label" style="margin-top:32px;">Análises detalhadas</div>
+    <div class="charts" id="charts"></div>
+  </div>
+</main>
+
+<footer>EcoBúzios &mdash; Fonte: public-stats-api &mdash; Atualizado a cada carregamento</footer>
+
+<script>
+const API = '/api/stats';
+const ORANGE      = '#C87830';
+const ORANGE_LITE = '#E8944A';
+const TEAL        = '#1E6B70';
+const TEAL_LITE   = '#2A8E95';
+const PALETTE     = ['#C87830','#1E6B70','#E8944A','#2A8E95','#A05A20','#0D3A3D','#F0A860','#5ECDD3','#7A4A1A','#3AACB4','#D4A060','#144C50'];
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleString('pt-BR', { dateStyle:'medium', timeStyle:'short' });
+}
+function pct(v, total) { return total ? Math.round(v / total * 100) : 0; }
+
+Chart.defaults.color = '#7A9E9F';
+
+async function loadData() {
+  const res   = await fetch(API);
+  const d     = await res.json();
+  const total = d.total_alunos_em_turmas;
+
+  const badge = document.getElementById('status-badge');
+  badge.textContent = d.ok ? 'API Online' : 'Erro';
+  document.getElementById('timestamp').textContent = 'Gerado em ' + fmtDate(d.gerado_em);
+
+  const pctPub = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
+  const kpiData = [
+    { icon:'🎓', label:'Total de Alunos',  value: total,                sub:'em turmas ativas',         accent: TEAL },
+    { icon:'📁', label:'Projetos',          value: d.por_projeto.length, sub:'projetos em andamento',    accent: ORANGE },
+    { icon:'📍', label:'Bairros',           value: d.bairros.length,     sub:'regiões atendidas',        accent: TEAL_LITE },
+    { icon:'🏫', label:'Escola Pública',    value: pctPub+'%',           sub:'dos alunos matriculados',  accent: ORANGE_LITE },
+  ];
+
+  document.getElementById('kpis').innerHTML = kpiData.map(k => `
+    <div class="kpi" style="--accent:${k.accent}">
+      <span class="icon">${k.icon}</span>
+      <div class="label">${k.label}</div>
+      <div class="value">${k.value}</div>
+      <div class="sub">${k.sub}</div>
+    </div>`).join('');
+
+  const c = document.getElementById('charts');
+  c.innerHTML = `
+    <div class="card">
+      <h2><span>📊</span> Alunos por Projeto</h2>
+      <div class="chart-wrap"><canvas id="cProjeto"></canvas></div>
+    </div>
+    <div class="card">
+      <h2><span>🏫</span> Tipo de Instituição</h2>
+      <div class="chart-wrap"><canvas id="cInst"></canvas></div>
+    </div>
+    <div class="card">
+      <h2><span>📅</span> Faixa Etária</h2>
+      <div class="chart-wrap"><canvas id="cIdade"></canvas></div>
+    </div>
+    <div class="card">
+      <h2><span>📍</span> Distribuição por Bairro</h2>
+      <div class="bar-list" id="bairroList"></div>
+    </div>`;
+
+  const doughnut = (id, labels, values, colors) => new Chart(document.getElementById(id), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#112224', hoverOffset: 10 }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { position:'right', labels:{ color:'#9ABCBC', font:{size:12}, boxWidth:13, padding:12 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${pct(ctx.parsed,total)}%)` } }
+      }
+    }
+  });
+
+  doughnut('cProjeto', d.por_projeto.map(p=>p.name), d.por_projeto.map(p=>p.value), [ORANGE, TEAL]);
+  doughnut('cInst',    d.instituicao.map(i=>i.name),  d.instituicao.map(i=>i.value), [TEAL, ORANGE, ORANGE_LITE]);
+
+  const order  = ['Até 10','11 – 14','15 – 17','18 – 24','25 – 35','36+'];
+  const sorted = order.map(n => d.idades.find(i=>i.name===n)||{name:n,value:0});
+
+  new Chart(document.getElementById('cIdade'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(i=>i.name),
+      datasets: [{ label:'Alunos', data: sorted.map(i=>i.value),
+        backgroundColor: [ORANGE,'#1E6B70','#E8944A','#2A8E95','#A05A20','#3AACB4'],
+        borderRadius: 8, borderSkipped: false }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display:false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} aluno${ctx.parsed.y!==1?'s':''}` } }
+      },
+      scales: {
+        x: { ticks:{ color:'#7A9E9F' }, grid:{ color:'#112224' } },
+        y: { ticks:{ color:'#7A9E9F', precision:0 }, grid:{ color:'#1E3E40' }, beginAtZero:true }
+      }
+    }
+  });
+
+  const bairros = [...d.bairros].sort((a,b)=>b.value-a.value);
+  const max     = bairros[0].value;
+  document.getElementById('bairroList').innerHTML = bairros.map((b,i) => `
+    <div class="bar-item">
+      <div class="bar-header">
+        <span>${b.name}</span>
+        <span class="bar-count">${b.value} aluno${b.value!==1?'s':''}</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${Math.round(b.value/max*100)}%;background:${PALETTE[i%PALETTE.length]}"></div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+}
+
+loadData().catch(err => {
+  document.getElementById('loading').innerHTML = `<p style="color:#C87830">Erro ao carregar: ${err.message}</p>`;
+});
+</script>
+</body>
+</html>
