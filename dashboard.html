@@ -253,6 +253,46 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 40px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .filter-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .18s;
+      font-family: inherit;
+    }
+    .filter-btn:hover {
+      border-color: var(--teal-light);
+      color: var(--text);
+    }
+    .filter-btn.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+      font-weight: 600;
+    }
+
     /* ── FOOTER ── */
     footer {
       text-align: center;
@@ -279,6 +319,12 @@
   </div>
 </header>
 
+<div class="filter-bar">
+  <span class="filter-label">Projeto:</span>
+  <button class="filter-btn active" data-id="">Todos</button>
+  <button class="filter-btn" data-id="2dc4ea41-e0f4-4084-bb64-2b414bf72cbc">EcoBúzios</button>
+  <button class="filter-btn" data-id="1608708a-969d-418a-be08-5c61154046c3">CircoLo Social</button>
+</div>
 
 <main>
   <div id="loading">
@@ -298,12 +344,15 @@
 <footer>EcoBúzios &mdash; Fonte: public-stats-api &mdash; Atualizado a cada carregamento</footer>
 
 <script>
-const API = '/api/stats';
+const API_BASE  = '/api/stats';
 const ORANGE      = '#C87830';
 const ORANGE_LITE = '#E8944A';
 const TEAL        = '#1E6B70';
 const TEAL_LITE   = '#2A8E95';
 const PALETTE     = ['#C87830','#1E6B70','#E8944A','#2A8E95','#A05A20','#0D3A3D','#F0A860','#5ECDD3','#7A4A1A','#3AACB4','#D4A060','#144C50'];
+
+let activeProjectId = '';
+let chartInstances  = [];
 
 function fmtDate(iso) {
   return new Date(iso).toLocaleString('pt-BR', { dateStyle:'medium', timeStyle:'short' });
@@ -312,8 +361,35 @@ function pct(v, total) { return total ? Math.round(v / total * 100) : 0; }
 
 Chart.defaults.color = '#7A9E9F';
 
-async function loadData() {
-  const res   = await fetch(API);
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeProjectId = btn.dataset.id;
+    reloadData();
+  });
+});
+
+function destroyCharts() {
+  chartInstances.forEach(c => c.destroy());
+  chartInstances = [];
+}
+
+function showLoading() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('content').style.display = 'none';
+}
+
+function reloadData() {
+  destroyCharts();
+  showLoading();
+  const url = activeProjectId ? `${API_BASE}?projetos=${activeProjectId}` : API_BASE;
+  loadData(url);
+}
+
+async function loadData(url = API_BASE) {
+  const res   = await fetch(url);
   const d     = await res.json();
   const total = d.total_alunos_em_turmas;
 
@@ -356,19 +432,23 @@ async function loadData() {
       <div class="bar-list" id="bairroList"></div>
     </div>`;
 
-  const doughnut = (id, labels, values, colors) => new Chart(document.getElementById(id), {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#112224', hoverOffset: 10 }] },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '68%',
-      plugins: {
-        legend: { position:'right', labels:{ color:'#9ABCBC', font:{size:12}, boxWidth:13, padding:12 } },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${pct(ctx.parsed,total)}%)` } }
+  const doughnut = (id, labels, values, colors) => {
+    const ch = new Chart(document.getElementById(id), {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#112224', hoverOffset: 10 }] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: { position:'right', labels:{ color:'#9ABCBC', font:{size:12}, boxWidth:13, padding:12 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${pct(ctx.parsed,total)}%)` } }
+        }
       }
-    }
-  });
+    });
+    chartInstances.push(ch);
+    return ch;
+  };
 
   doughnut('cProjeto', d.por_projeto.map(p=>p.name), d.por_projeto.map(p=>p.value), [ORANGE, TEAL]);
   doughnut('cInst',    d.instituicao.map(i=>i.name),  d.instituicao.map(i=>i.value), [TEAL, ORANGE, ORANGE_LITE]);
@@ -376,7 +456,7 @@ async function loadData() {
   const order  = ['Até 10','11 – 14','15 – 17','18 – 24','25 – 35','36+'];
   const sorted = order.map(n => d.idades.find(i=>i.name===n)||{name:n,value:0});
 
-  new Chart(document.getElementById('cIdade'), {
+  const idadeChart = new Chart(document.getElementById('cIdade'), {
     type: 'bar',
     data: {
       labels: sorted.map(i=>i.name),
@@ -397,6 +477,7 @@ async function loadData() {
       }
     }
   });
+  chartInstances.push(idadeChart);
 
   const bairros = [...d.bairros].sort((a,b)=>b.value-a.value);
   const max     = bairros[0].value;
