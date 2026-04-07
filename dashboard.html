@@ -477,7 +477,7 @@ async function loadData(url = API_BASE) {
   const totalHoras = totalAulas * 2;
   const kpiData = [
     { icon:'🎓', label:'Total de Alunos',  value: total,                sub:'em turmas ativas',         accent: TEAL },
-    { icon:'📚', label:'Aulas no Ano',     value: totalAulas,           sub:`${totalHoras}h realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
+    { icon:'📚', label:'Aulas no Ano',     value: `${totalAulas} <span style="font-size:1.4rem;opacity:.75">/</span> ${totalHoras}h`, sub:`aulas · horas realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
     { icon:'📍', label:'Bairros',          value: d.bairros.length,     sub:'regiões atendidas',        accent: TEAL_LITE },
     { icon:'🏫', label:'Escola Pública',   value: pctPub+'%',           sub:'dos alunos matriculados',  accent: ORANGE_LITE },
   ];
