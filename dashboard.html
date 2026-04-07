@@ -408,11 +408,9 @@
   </div>
 </header>
 
-<div class="filter-bar">
+<div class="filter-bar" id="filter-bar">
   <span class="filter-label">Projeto:</span>
   <button class="filter-btn active" data-id="">Todos</button>
-  <button class="filter-btn" data-id="2dc4ea41-e0f4-4084-bb64-2b414bf72cbc">EcoBúzios</button>
-  <button class="filter-btn" data-id="1608708a-969d-418a-be08-5c61154046c3">CircoLo Social</button>
 </div>
 
 <main>
@@ -447,6 +445,7 @@ const LOGOS = {
   '':                                         'logo%20EcoBuzios.png',
   '2dc4ea41-e0f4-4084-bb64-2b414bf72cbc':    'logo%20EcoBuzios.png',
   '1608708a-969d-418a-be08-5c61154046c3':    'logo%20CircoLo.jpg',
+  '1274b28c-5772-448e-95af-547b841cb187':    'logo%20EcoBuzios.png',
 };
 
 function fmtDate(iso) {
@@ -456,16 +455,18 @@ function pct(v, total) { return total ? Math.round(v / total * 100) : 0; }
 
 Chart.defaults.color = '#7A9E9F';
 
-// Filter buttons
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeProjectId = btn.dataset.id;
-    document.querySelector('.logo-wrap img').src = LOGOS[activeProjectId] || LOGOS[''];
-    reloadData();
+function bindFilterButtons() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeProjectId = btn.dataset.id;
+      document.querySelector('.logo-wrap img').src = LOGOS[activeProjectId] || LOGOS[''];
+      reloadData();
+    });
   });
-});
+}
+bindFilterButtons();
 
 function destroyCharts() {
   chartInstances.forEach(c => c.destroy());
@@ -492,6 +493,19 @@ async function loadData(url = API_BASE) {
   const badge = document.getElementById('status-badge');
   badge.textContent = d.ok ? 'API Online' : 'Erro';
   document.getElementById('timestamp').textContent = 'Gerado em ' + fmtDate(d.gerado_em);
+
+  // Renderiza botões de projeto dinamicamente (só na primeira carga)
+  if (d.projetos_lista && document.querySelectorAll('.filter-btn').length === 1) {
+    const bar = document.getElementById('filter-bar');
+    d.projetos_lista.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.id = p.id;
+      btn.textContent = p.name.replace(' (2025-2026)', '').replace(' - Centro', '');
+      bar.appendChild(btn);
+    });
+    bindFilterButtons();
+  }
 
   const pctPub   = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
   const totalAulas = d.frequencia?.total_aulas_ano ?? 0;
