@@ -474,9 +474,10 @@ async function loadData(url = API_BASE) {
 
   const pctPub   = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
   const totalAulas = d.frequencia?.total_aulas_ano ?? 0;
+  const totalHoras = totalAulas * 2;
   const kpiData = [
     { icon:'🎓', label:'Total de Alunos',  value: total,                sub:'em turmas ativas',         accent: TEAL },
-    { icon:'📚', label:'Aulas no Ano',     value: totalAulas,           sub:'aulas realizadas em ' + (d.frequencia?.ano ?? ''),  accent: ORANGE },
+    { icon:'📚', label:'Aulas no Ano',     value: totalAulas,           sub:`${totalHoras}h realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
     { icon:'📍', label:'Bairros',          value: d.bairros.length,     sub:'regiões atendidas',        accent: TEAL_LITE },
     { icon:'🏫', label:'Escola Pública',   value: pctPub+'%',           sub:'dos alunos matriculados',  accent: ORANGE_LITE },
   ];
