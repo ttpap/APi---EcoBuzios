@@ -293,6 +293,73 @@
       font-weight: 600;
     }
 
+    /* ── PRINT BUTTON ── */
+    .print-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .18s;
+    }
+    .print-btn:hover { background: var(--orange-light); }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 15mm 12mm;
+      }
+      body {
+        background: #fff !important;
+        color: #111 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      header {
+        background: #0D3A3D !important;
+        position: static !important;
+        padding: 12px 20px !important;
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+      .filter-bar, .print-btn, .badge, .timestamp { display: none !important; }
+      .logo-label strong { color: #fff !important; }
+      .logo-label { color: #ccc !important; }
+      main { padding: 0 !important; }
+      .kpis { grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; margin-bottom: 16px !important; }
+      .kpi {
+        background: #f4f8f8 !important;
+        border: 1px solid #d0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        break-inside: avoid;
+      }
+      .kpi .value { font-size: 1.8rem !important; color: #111 !important; }
+      .kpi .label, .kpi .sub { color: #555 !important; }
+      .section-label { color: #C87830 !important; border-color: #ddd !important; }
+      .charts { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+      .card {
+        background: #f9fafb !important;
+        border: 1px solid #ddd !important;
+        border-radius: 8px !important;
+        padding: 14px !important;
+        break-inside: avoid;
+      }
+      .card h2 { color: #555 !important; }
+      .bar-track { background: #e0ecec !important; }
+      .bar-count { color: #444 !important; }
+      .bar-header { color: #222 !important; }
+      footer { color: #999 !important; font-size: 0.65rem !important; padding: 8px !important; }
+    }
+
     /* ── FOOTER ── */
     footer {
       text-align: center;
@@ -314,6 +381,7 @@
     </div>
   </div>
   <div class="header-right">
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / PDF</button>
     <span class="badge" id="status-badge">Carregando…</span>
     <span class="timestamp" id="timestamp"></span>
   </div>
