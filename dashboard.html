@@ -422,6 +422,12 @@ const PALETTE     = ['#C87830','#1E6B70','#E8944A','#2A8E95','#A05A20','#0D3A3D'
 let activeProjectId = '';
 let chartInstances  = [];
 
+const LOGOS = {
+  '':                                         'logo%20EcoBuzios.png',
+  '2dc4ea41-e0f4-4084-bb64-2b414bf72cbc':    'logo%20EcoBuzios.png',
+  '1608708a-969d-418a-be08-5c61154046c3':    'logo%20CircoLo.jpg',
+};
+
 function fmtDate(iso) {
   return new Date(iso).toLocaleString('pt-BR', { dateStyle:'medium', timeStyle:'short' });
 }
@@ -435,6 +441,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeProjectId = btn.dataset.id;
+    document.querySelector('.logo-wrap img').src = LOGOS[activeProjectId] || LOGOS[''];
     reloadData();
   });
 });
