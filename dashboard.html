@@ -404,7 +404,7 @@
     </div>
   </div>
   <div class="header-right">
-    <button class="print-btn" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    <button class="print-btn" onclick="printDashboard()">🖨️ Imprimir / PDF</button>
     <span class="badge" id="status-badge">Carregando…</span>
     <span class="timestamp" id="timestamp"></span>
   </div>
@@ -637,6 +637,28 @@ setInterval(async () => {
     document.getElementById('timestamp').textContent = 'Gerado em ' + fmtDate(d.gerado_em);
   } catch (_) {}
 }, 5000);
+
+function printDashboard() {
+  // Converte cada canvas em <img> para garantir impressão correta
+  const canvases = document.querySelectorAll('canvas');
+  const replacements = [];
+  canvases.forEach(canvas => {
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png');
+    img.style.width = '100%';
+    img.style.height = 'auto';
+    img.style.display = 'block';
+    canvas.parentNode.insertBefore(img, canvas);
+    canvas.style.display = 'none';
+    replacements.push({ canvas, img });
+  });
+  window.print();
+  // Restaura os canvas após a impressão
+  replacements.forEach(({ canvas, img }) => {
+    img.remove();
+    canvas.style.display = '';
+  });
+}
 </script>
 </body>
 </html>
