@@ -873,32 +873,47 @@ function closePreview() {
   document.getElementById('preview-modal').classList.remove('open');
 }
 
-// Guarda referências para restaurar após print
-const _printSwaps = new Map();
-
-window.addEventListener('beforeprint', () => {
-  document.querySelectorAll('canvas').forEach(canvas => {
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png');
-    img.style.cssText = 'width:100%;height:auto;display:block;';
-    canvas.parentNode.insertBefore(img, canvas);
-    canvas.style.display = 'none';
-    _printSwaps.set(img, canvas);
-  });
-});
-
-window.addEventListener('afterprint', () => {
-  _printSwaps.forEach((canvas, img) => {
-    canvas.style.display = '';
-    img.remove();
-  });
-  _printSwaps.clear();
-  closePreview();
-});
-
 function doPrint() {
-  closePreview();
-  setTimeout(() => window.print(), 100);
+  const pageHTML = document.getElementById('preview-page').innerHTML;
+  const css = `
+    @page { size: A4 portrait; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #fff; padding: 15mm 12mm; }
+    .preview-header { background: #0D3A3D; border-radius: 8px; padding: 12px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .preview-header img { height: 48px; border-radius: 6px; }
+    .preview-header strong { color: #fff; font-size: 0.95rem; display: block; }
+    .preview-header small { color: #ccc; font-size: 0.78rem; }
+    .p-section { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #C87830; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 12px; }
+    .p-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .p-kpi { background: #eef4f4; border: 1px solid #b0cece; border-radius: 8px; padding: 10px 12px; }
+    .p-icon { font-size: 1.1rem; margin-bottom: 6px; display: block; }
+    .p-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .6px; color: #666; font-weight: 600; margin-bottom: 4px; }
+    .p-value { font-size: 1.5rem; font-weight: 800; color: #111; line-height: 1; }
+    .p-sub { font-size: 0.68rem; color: #777; margin-top: 4px; }
+    .p-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .p-card { background: #f9fafb; border: 1px solid #ddd; border-radius: 8px; padding: 12px; break-inside: avoid; }
+    .p-card h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: .6px; color: #666; margin-bottom: 10px; font-weight: 700; }
+    .p-card img { width: 100%; height: auto; display: block; }
+    .p-bar-item { margin-bottom: 8px; }
+    .p-bar-header { display: flex; justify-content: space-between; font-size: 0.74rem; color: #333; margin-bottom: 3px; }
+    .p-bar-track { background: #e0ecec; border-radius: 4px; height: 7px; overflow: hidden; }
+    .p-bar-fill { height: 100%; border-radius: 4px; }
+    .p-footer { text-align: center; font-size: 0.62rem; color: #999; margin-top: 20px; padding-top: 12px; border-top: 1px solid #eee; }
+  `;
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>EcoBúzios — Painel de Alunos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>${css}</style>
+</head>
+<body>${pageHTML}</body>
+</html>`);
+  win.document.close();
+  win.addEventListener('load', () => { win.focus(); win.print(); });
 }
 </script>
 </body>
