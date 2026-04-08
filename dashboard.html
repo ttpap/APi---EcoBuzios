@@ -666,9 +666,29 @@ setInterval(async () => {
   } catch (_) {}
 }, 5000);
 
+// Guarda referências para restaurar após print
+const _printSwaps = new Map();
+
+window.addEventListener('beforeprint', () => {
+  document.querySelectorAll('canvas').forEach(canvas => {
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png');
+    img.style.cssText = 'width:100%;height:auto;display:block;';
+    canvas.parentNode.insertBefore(img, canvas);
+    canvas.style.display = 'none';
+    _printSwaps.set(img, canvas);
+  });
+});
+
+window.addEventListener('afterprint', () => {
+  _printSwaps.forEach((canvas, img) => {
+    canvas.style.display = '';
+    img.remove();
+  });
+  _printSwaps.clear();
+});
+
 function printDashboard() {
-  // Atualiza as imagens de print antes de abrir o diálogo
-  document.querySelectorAll('canvas').forEach(canvas => makeChartImg && makeChartImg(canvas));
   window.print();
 }
 </script>
