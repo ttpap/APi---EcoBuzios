@@ -639,7 +639,6 @@ setInterval(async () => {
 }, 5000);
 
 function printDashboard() {
-  // Converte cada canvas em <img> para garantir impressão correta
   const canvases = document.querySelectorAll('canvas');
   const replacements = [];
   canvases.forEach(canvas => {
@@ -652,12 +651,15 @@ function printDashboard() {
     canvas.style.display = 'none';
     replacements.push({ canvas, img });
   });
-  window.print();
-  // Restaura os canvas após a impressão
-  replacements.forEach(({ canvas, img }) => {
-    img.remove();
-    canvas.style.display = '';
+  // Restaura os canvas DEPOIS que a impressão terminar
+  window.addEventListener('afterprint', function restore() {
+    replacements.forEach(({ canvas, img }) => {
+      img.remove();
+      canvas.style.display = '';
+    });
+    window.removeEventListener('afterprint', restore);
   });
+  window.print();
 }
 </script>
 </body>
