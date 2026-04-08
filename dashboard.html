@@ -334,18 +334,14 @@
     }
     .print-btn:hover { background: var(--orange-light); }
 
+    /* imagem substituta do gráfico — visível só em print */
+    .chart-img { display: none; width: 100%; height: auto; }
+
     /* ── PRINT STYLES ── */
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 15mm 12mm;
-      }
-      body {
-        background: #fff !important;
-        color: #111 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
+      @page { size: A4 portrait; margin: 15mm 12mm; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: #fff !important; color: #111 !important; }
       header {
         background: #0D3A3D !important;
         position: static !important;
@@ -357,18 +353,32 @@
       .logo-label strong { color: #fff !important; }
       .logo-label { color: #ccc !important; }
       main { padding: 0 !important; }
-      .kpis { grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; margin-bottom: 16px !important; }
+      .kpis {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 16px !important;
+      }
       .kpi {
-        background: #f4f8f8 !important;
-        border: 1px solid #d0e0e0 !important;
+        display: block !important;
+        background: #eef4f4 !important;
+        border: 1px solid #b0cece !important;
         border-radius: 8px !important;
         padding: 12px !important;
+        overflow: visible !important;
         break-inside: avoid;
       }
+      .kpi::before, .kpi::after { display: none !important; }
+      .kpi .icon { display: block !important; color: #333 !important; margin-bottom: 8px !important; }
+      .kpi .label { color: #555 !important; }
       .kpi .value { font-size: 1.8rem !important; color: #111 !important; }
-      .kpi .label, .kpi .sub { color: #555 !important; }
+      .kpi .sub { color: #666 !important; }
       .section-label { color: #C87830 !important; border-color: #ddd !important; }
-      .charts { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+      .charts {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+      }
       .card {
         background: #f9fafb !important;
         border: 1px solid #ddd !important;
@@ -377,6 +387,10 @@
         break-inside: avoid;
       }
       .card h2 { color: #555 !important; }
+      /* esconde canvas, mostra imagem */
+      canvas { display: none !important; }
+      .chart-img { display: block !important; }
+      .chart-wrap { height: auto !important; }
       .bar-track { background: #e0ecec !important; }
       .bar-count { color: #444 !important; }
       .bar-header { color: #222 !important; }
@@ -443,6 +457,15 @@ const PALETTE     = ['#C87830','#1E6B70','#E8944A','#2A8E95','#A05A20','#0D3A3D'
 
 let activeProjectId = '';
 let chartInstances  = [];
+
+function makeChartImg(canvas) {
+  const existing = canvas.parentNode.querySelector('.chart-img');
+  if (existing) existing.remove();
+  const img = document.createElement('img');
+  img.className = 'chart-img';
+  img.src = canvas.toDataURL('image/png');
+  canvas.parentNode.appendChild(img);
+}
 
 const LOGOS = {
   '':                                         'logo%20EcoBuzios.png',
@@ -548,7 +571,8 @@ async function loadData(url = API_BASE) {
     </div>`;
 
   const doughnut = (id, labels, values, colors) => {
-    const ch = new Chart(document.getElementById(id), {
+    const canvas = document.getElementById(id);
+    const ch = new Chart(canvas, {
       type: 'doughnut',
       data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#112224', hoverOffset: 10 }] },
       options: {
@@ -558,7 +582,8 @@ async function loadData(url = API_BASE) {
         plugins: {
           legend: { position:'right', labels:{ color:'#9ABCBC', font:{size:12}, boxWidth:13, padding:12 } },
           tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${pct(ctx.parsed,total)}%)` } }
-        }
+        },
+        animation: { onComplete: () => makeChartImg(canvas) }
       }
     });
     chartInstances.push(ch);
@@ -571,7 +596,8 @@ async function loadData(url = API_BASE) {
   const order  = ['Até 10','11 – 14','15 – 17','18 – 24','25 – 35','36+'];
   const sorted = order.map(n => d.idades.find(i=>i.name===n)||{name:n,value:0});
 
-  const idadeChart = new Chart(document.getElementById('cIdade'), {
+  const idadeCanvas = document.getElementById('cIdade');
+  const idadeChart = new Chart(idadeCanvas, {
     type: 'bar',
     data: {
       labels: sorted.map(i=>i.name),
@@ -589,7 +615,8 @@ async function loadData(url = API_BASE) {
       scales: {
         x: { ticks:{ color:'#7A9E9F' }, grid:{ color:'#112224' } },
         y: { ticks:{ color:'#7A9E9F', precision:0 }, grid:{ color:'#1E3E40' }, beginAtZero:true }
-      }
+      },
+      animation: { onComplete: () => makeChartImg(idadeCanvas) }
     }
   });
   chartInstances.push(idadeChart);
@@ -640,26 +667,8 @@ setInterval(async () => {
 }, 5000);
 
 function printDashboard() {
-  const canvases = document.querySelectorAll('canvas');
-  const replacements = [];
-  canvases.forEach(canvas => {
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png');
-    img.style.width = '100%';
-    img.style.height = 'auto';
-    img.style.display = 'block';
-    canvas.parentNode.insertBefore(img, canvas);
-    canvas.style.display = 'none';
-    replacements.push({ canvas, img });
-  });
-  // Restaura os canvas DEPOIS que a impressão terminar
-  window.addEventListener('afterprint', function restore() {
-    replacements.forEach(({ canvas, img }) => {
-      img.remove();
-      canvas.style.display = '';
-    });
-    window.removeEventListener('afterprint', restore);
-  });
+  // Atualiza as imagens de print antes de abrir o diálogo
+  document.querySelectorAll('canvas').forEach(canvas => makeChartImg && makeChartImg(canvas));
   window.print();
 }
 </script>
