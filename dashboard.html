@@ -694,7 +694,7 @@ async function loadData(url = API_BASE) {
   const totalReunioes = d.reunioes?.total ?? 0;
   const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
   const totalAulas = totalAulasPuras + totalReunioes;
-  const totalHoras = totalAulas * 2;
+  const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes;
   const kpiData = [
     { icon:'🎓', label:'Total de Alunos',  value: total,                sub:'em turmas ativas',         accent: TEAL },
     { icon:'📚', label:'Aulas no Ano',     value: `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`, sub:`horas realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
@@ -815,9 +815,8 @@ setInterval(async () => {
     const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
     const totalReunioes   = d.reunioes?.total ?? 0;
     const totalAulas      = totalAulasPuras + totalReunioes;
-    const totalHoras      = totalAulas * 2;
-
     const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
+    const totalHoras      = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes;
 
     // Atualiza todos os valores dos cards
     const values = document.querySelectorAll('#kpis .value');
