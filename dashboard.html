@@ -612,12 +612,38 @@ const LOGOS = {
   '1274b28c-5772-448e-95af-547b841cb187':    'logo%20EcoBuzios.png',
 };
 
+// Mapeia nomes do banco para nomes limpos exibidos na interface
+const PROJECT_NAMES = {
+  '1274b28c-5772-448e-95af-547b841cb187': 'CircoLo Social',
+  '04bef2d1-42e5-4a24-81db-926253db7f1a': 'Tenis de Mesa',
+  '1608708a-969d-418a-be08-5c61154046c3': 'CircoLo Centro',
+};
+function cleanProjectName(name) {
+  const found = Object.values(PROJECT_NAMES).find(n => name.includes(n.split(' ')[0]));
+  return found || name.replace(' (migração)', '').replace(' (2025-2026)', '').replace(' - Centro', '');
+}
+
 function fmtDate(iso) {
   return new Date(iso).toLocaleString('pt-BR', { dateStyle:'medium', timeStyle:'short' });
 }
 function pct(v, total) { return total ? Math.round(v / total * 100) : 0; }
 
 Chart.defaults.color = '#7A9E9F';
+
+// Lista de projetos com IDs reais do banco
+function renderProjectButtons(projetos) {
+  const bar = document.getElementById('filter-bar');
+  // Remove botões anteriores (exceto "Todos")
+  bar.querySelectorAll('.filter-btn:not([data-id=""])').forEach(b => b.remove());
+  projetos.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.id = p.id;
+    btn.textContent = p.name;
+    bar.appendChild(btn);
+  });
+  bindFilterButtons();
+}
 
 function bindFilterButtons() {
   document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -658,24 +684,17 @@ async function loadData(url = API_BASE) {
   badge.textContent = d.ok ? 'API Online' : 'Erro';
   document.getElementById('timestamp').textContent = 'Gerado em ' + fmtDate(d.gerado_em);
 
-  // Renderiza botões de projeto dinamicamente (só na primeira carga)
-  if (d.projetos_lista && document.querySelectorAll('.filter-btn').length === 1) {
-    const bar = document.getElementById('filter-bar');
-    d.projetos_lista.forEach(p => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn';
-      btn.dataset.id = p.id;
-      btn.textContent = p.name.replace(' (2025-2026)', '').replace(' - Centro', '');
-      bar.appendChild(btn);
-    });
-    bindFilterButtons();
+  // Renderiza botões de projeto dinamicamente a cada carga (reflete projetos ativos do banco)
+  if (d.projetos_lista) {
+    renderProjectButtons(d.projetos_lista);
   }
 
   const pctPub   = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
-  const totalAulas = d.frequencia?.total_aulas_ano ?? 0;
-  const totalHoras = totalAulas * 2;
+  const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
   const totalReunioes = d.reunioes?.total ?? 0;
   const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
+  const totalAulas = totalAulasPuras + totalReunioes;
+  const totalHoras = totalAulas * 2;
   const kpiData = [
     { icon:'🎓', label:'Total de Alunos',  value: total,                sub:'em turmas ativas',         accent: TEAL },
     { icon:'📚', label:'Aulas no Ano',     value: `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`, sub:`horas realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
@@ -731,7 +750,7 @@ async function loadData(url = API_BASE) {
     return ch;
   };
 
-  doughnut('cProjeto', d.por_projeto.map(p=>p.name), d.por_projeto.map(p=>p.value), [ORANGE, TEAL]);
+  doughnut('cProjeto', d.por_projeto.map(p=>cleanProjectName(p.name)), d.por_projeto.map(p=>p.value), [ORANGE, TEAL]);
   doughnut('cInst',    d.instituicao.map(i=>i.name),  d.instituicao.map(i=>i.value), [TEAL, ORANGE, ORANGE_LITE]);
 
   const order  = ['Até 10','11 – 14','15 – 17','18 – 24','25 – 35','36+'];
@@ -793,8 +812,10 @@ setInterval(async () => {
 
     const total     = d.total_alunos_em_turmas;
     const pctPub    = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
-    const totalAulas = d.frequencia?.total_aulas_ano ?? 0;
-    const totalHoras = totalAulas * 2;
+    const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
+    const totalReunioes   = d.reunioes?.total ?? 0;
+    const totalAulas      = totalAulasPuras + totalReunioes;
+    const totalHoras      = totalAulas * 2;
 
     // Atualiza só os valores dos cards
     const values = document.querySelectorAll('#kpis .value');
