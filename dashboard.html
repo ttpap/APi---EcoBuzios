@@ -10,16 +10,16 @@
     :root {
       --orange:      #C87830;
       --orange-light:#E8944A;
-      --orange-dim:  #7A4A1A;
-      --teal:        #1E6B70;
+      --orange-dim:  #FEF0E2;
+      --teal:        #1A6065;
       --teal-light:  #2A8E95;
-      --teal-dim:    #0D3A3D;
-      --bg:          #0B1A1B;
-      --surface:     #112224;
-      --surface2:    #172E30;
-      --border:      #1E3E40;
-      --text:        #E8F0F0;
-      --muted:       #7A9E9F;
+      --teal-dim:    #D8ECED;
+      --bg:          #EEF5F5;
+      --surface:     #FFFFFF;
+      --surface2:    #E6F0F0;
+      --border:      #BDD4D5;
+      --text:        #0E2224;
+      --muted:       #4A7275;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +33,7 @@
 
     /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, var(--teal-dim) 0%, #0B1A1B 60%);
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
       padding: 0 40px;
       display: flex;
@@ -55,9 +55,7 @@
 
     .logo-wrap img {
       height: 72px;
-      filter: brightness(1.3);
-      mix-blend-mode: screen;
-      border-radius: 10px;
+      filter: drop-shadow(0 1px 4px rgba(14,34,36,0.22));
     }
 
     .logo-divider {
@@ -89,9 +87,9 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      background: rgba(30,107,112,.25);
-      color: #5ECDD3;
-      border: 1px solid rgba(30,107,112,.6);
+      background: rgba(30,107,112,.1);
+      color: var(--teal);
+      border: 1px solid rgba(30,107,112,.35);
       border-radius: 20px;
       padding: 5px 14px;
       font-size: 0.74rem;
@@ -102,7 +100,7 @@
       content: '';
       width: 7px; height: 7px;
       border-radius: 50%;
-      background: #5ECDD3;
+      background: var(--teal);
       animation: blink 2s infinite;
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
@@ -249,7 +247,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.82rem;
-      color: #CBD5D5;
+      color: var(--text);
     }
     .bar-count { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
     .bar-track {
@@ -584,7 +582,7 @@
 
 <header>
   <div class="logo-wrap">
-    <img src="logo%20EcoBuzios.png" alt="EcoBúzios" />
+    <img src="logo-ecobuzios-transparent.png" alt="EcoBúzios" />
     <div class="logo-divider"></div>
     <div class="logo-label">
       <strong>Painel de Alunos</strong>
@@ -642,10 +640,10 @@ function makeChartImg(canvas) {
 }
 
 const LOGOS = {
-  '':                                         'logo%20EcoBuzios.png',
-  '2dc4ea41-e0f4-4084-bb64-2b414bf72cbc':    'logo%20EcoBuzios.png',
+  '':                                         'logo-ecobuzios-transparent.png',
+  '2dc4ea41-e0f4-4084-bb64-2b414bf72cbc':    'logo-ecobuzios-transparent.png',
   '1608708a-969d-418a-be08-5c61154046c3':    'logo%20CircoLo.jpg',
-  '1274b28c-5772-448e-95af-547b841cb187':    'logo%20EcoBuzios.png',
+  '1274b28c-5772-448e-95af-547b841cb187':    'logo-ecobuzios-transparent.png',
 };
 
 // Mapeia nomes do banco para nomes limpos exibidos na interface
@@ -664,7 +662,7 @@ function fmtDate(iso) {
 }
 function pct(v, total) { return total ? Math.round(v / total * 100) : 0; }
 
-Chart.defaults.color = '#7A9E9F';
+Chart.defaults.color = '#4A7275';
 
 // Lista de projetos com IDs reais do banco
 function renderProjectButtons(projetos) {
@@ -778,13 +776,13 @@ async function loadData(url = API_BASE) {
     canvas.setAttribute('aria-label', `Gráfico de rosca — ${summary}`);
     const ch = new Chart(canvas, {
       type: 'doughnut',
-      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#112224', hoverOffset: 10 }] },
+      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#FFFFFF', hoverOffset: 10 }] },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         cutout: '68%',
         plugins: {
-          legend: { position:'right', labels:{ color:'#9ABCBC', font:{size:12}, boxWidth:13, padding:12 } },
+          legend: { position:'right', labels:{ color:'#4A7275', font:{size:12}, boxWidth:13, padding:12 } },
           tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${pct(ctx.parsed,total)}%)` } }
         },
         animation: { onComplete: () => makeChartImg(canvas) }
@@ -820,8 +818,8 @@ async function loadData(url = API_BASE) {
         tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} aluno${ctx.parsed.y!==1?'s':''}` } }
       },
       scales: {
-        x: { ticks:{ color:'#7A9E9F' }, grid:{ color:'#112224' } },
-        y: { ticks:{ color:'#7A9E9F', precision:0 }, grid:{ color:'#1E3E40' }, beginAtZero:true }
+        x: { ticks:{ color:'#4A7275' }, grid:{ color:'#C8DEDE' } },
+        y: { ticks:{ color:'#4A7275', precision:0 }, grid:{ color:'#DAEAEA' }, beginAtZero:true }
       },
       animation: { onComplete: () => makeChartImg(idadeCanvas) }
     }
