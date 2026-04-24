@@ -477,9 +477,10 @@
       transition: opacity .18s;
     }
     .preview-btn:hover { opacity: .85; }
-    .preview-btn-print { background: #C87830; color: #fff; }
-    .preview-btn-pdf   { background: #1E6B70; color: #fff; }
-    .preview-btn-close { background: #1E3E40; color: #7A9E9F; }
+    .preview-btn-print  { background: #C87830; color: #fff; }
+    .preview-btn-pdf    { background: #1E6B70; color: #fff; }
+    .preview-btn-close  { background: #1E3E40; color: #7A9E9F; }
+    .preview-btn-toggle { background: #2A2A2A; color: #ccc; border: 1px solid #555; }
 
     #preview-scroll {
       flex: 1;
@@ -503,63 +504,61 @@
       box-sizing: border-box;
     }
 
-    /* estilos internos do preview (equivalente ao @media print) */
-    .preview-page .preview-header {
-      background: #0D3A3D;
-      border-radius: 8px;
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    .preview-page .preview-header img { height: 48px; border-radius: 6px; }
-    .preview-page .preview-header strong { color: #fff; font-size: 0.95rem; display: block; }
-    .preview-page .preview-header small { color: #ccc; font-size: 0.78rem; }
-    .preview-page .p-section {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #C87830;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-    }
-    .preview-page .p-kpis {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .preview-page .p-kpi {
-      background: #eef4f4;
-      border: 1px solid #b0cece;
-      border-radius: 8px;
-      padding: 10px 12px;
-    }
-    .preview-page .p-kpi .p-icon { font-size: 1.1rem; margin-bottom: 6px; display: block; }
-    .preview-page .p-kpi .p-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .6px; color: #666; font-weight: 600; margin-bottom: 4px; }
-    .preview-page .p-kpi .p-value { font-size: 1.5rem; font-weight: 800; color: #111; line-height: 1; }
-    .preview-page .p-kpi .p-sub { font-size: 0.68rem; color: #777; margin-top: 4px; }
-    .preview-page .p-charts {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-    .preview-page .p-card {
-      background: #f9fafb;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 12px;
-    }
-    .preview-page .p-card h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: .6px; color: #666; margin-bottom: 10px; font-weight: 700; }
-    .preview-page .p-card img { width: 100%; height: auto; display: block; }
-    .preview-page .p-bar-item { margin-bottom: 8px; }
-    .preview-page .p-bar-header { display: flex; justify-content: space-between; font-size: 0.74rem; color: #333; margin-bottom: 3px; }
-    .preview-page .p-bar-track { background: #e0ecec; border-radius: 4px; height: 7px; overflow: hidden; }
-    .preview-page .p-bar-fill { height: 100%; border-radius: 4px; }
-    .preview-page .p-footer { text-align: center; font-size: 0.62rem; color: #999; margin-top: 20px; padding-top: 12px; border-top: 1px solid #eee; }
+    /* ── PRINT PREVIEW — layout compartilhado ── */
+    .preview-page .preview-header { border-radius: 6px; padding: 8px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .preview-page .preview-header img { height: 34px; border-radius: 4px; }
+    .preview-page .preview-header strong { font-size: 0.85rem; display: block; }
+    .preview-page .preview-header small { font-size: 0.72rem; }
+    .preview-page .p-section { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom-width: 2px; border-bottom-style: solid; padding-bottom: 4px; margin-bottom: 8px; }
+    .preview-page .p-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+    .preview-page .p-kpi { border-radius: 6px; padding: 7px 9px; border-width: 1px; border-style: solid; }
+    .preview-page .p-kpi .p-icon { font-size: 1rem; margin-bottom: 4px; display: block; }
+    .preview-page .p-kpi .p-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin-bottom: 3px; }
+    .preview-page .p-kpi .p-value { font-size: 1.3rem; font-weight: 800; color: #000; line-height: 1; }
+    .preview-page .p-kpi .p-sub { font-size: 0.62rem; margin-top: 3px; }
+    .preview-page .p-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .preview-page .p-card { border-radius: 6px; padding: 8px; border-width: 1px; border-style: solid; }
+    .preview-page .p-card h3 { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; font-weight: 700; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    .preview-page .p-card img { width: 100%; height: auto; display: block; max-height: 118px; object-fit: contain; }
+    .preview-page .p-bar-item { margin-bottom: 5px; }
+    .preview-page .p-bar-header { display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 2px; font-weight: 600; }
+    .preview-page .p-bar-track { border-radius: 3px; height: 8px; overflow: hidden; }
+    .preview-page .p-bar-fill { height: 100%; border-radius: 2px; }
+    .preview-page .p-footer { text-align: center; font-size: 0.58rem; margin-top: 10px; padding-top: 8px; border-top: 1px solid #ccc; }
+
+    /* ── Modo P&B ── */
+    .preview-page.bw .preview-header { background: #111; }
+    .preview-page.bw .preview-header img { filter: brightness(0) invert(1); }
+    .preview-page.bw .preview-header strong { color: #fff; }
+    .preview-page.bw .preview-header small { color: #ccc; }
+    .preview-page.bw .p-section { color: #111; border-bottom-color: #111; }
+    .preview-page.bw .p-kpi { background: #f0f0f0; border-color: #888; }
+    .preview-page.bw .p-kpi .p-label { color: #333; }
+    .preview-page.bw .p-kpi .p-sub { color: #444; }
+    .preview-page.bw .p-card { background: #fff; border-color: #888; }
+    .preview-page.bw .p-card h3 { color: #333; }
+    .preview-page.bw .p-card img { filter: grayscale(1); }
+    .preview-page.bw .p-bar-header { color: #111; }
+    .preview-page.bw .p-bar-track { background: #ddd; border: 1px solid #bbb; }
+    .preview-page.bw .p-bar-fill { background: #333; }
+    .preview-page.bw .p-footer { color: #555; }
+
+    /* ── Modo Colorido ── */
+    .preview-page.color .preview-header { background: #0D3A3D; }
+    .preview-page.color .preview-header img { filter: none; }
+    .preview-page.color .preview-header strong { color: #fff; }
+    .preview-page.color .preview-header small { color: #ccc; }
+    .preview-page.color .p-section { color: #C87830; border-bottom-color: #ddd; border-bottom-width: 1px; }
+    .preview-page.color .p-kpi { background: #eef4f4; border-color: #b0cece; }
+    .preview-page.color .p-kpi .p-label { color: #666; }
+    .preview-page.color .p-kpi .p-sub { color: #777; }
+    .preview-page.color .p-card { background: #f9fafb; border-color: #ddd; }
+    .preview-page.color .p-card h3 { color: #666; }
+    .preview-page.color .p-card img { filter: none; }
+    .preview-page.color .p-bar-header { color: #333; }
+    .preview-page.color .p-bar-track { background: #e0ecec; }
+    .preview-page.color .p-bar-fill { background: #C87830; }
+    .preview-page.color .p-footer { color: #999; }
   </style>
 </head>
 <body>
@@ -571,8 +570,9 @@
 <div id="preview-modal" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
   <div id="preview-bar">
     <span id="preview-modal-title">Pré-visualização de impressão</span>
+    <button class="preview-btn preview-btn-toggle" id="mode-toggle" onclick="toggleMode()">🔲 Preto e Branco</button>
     <button class="preview-btn preview-btn-print" onclick="doPrint()">🖨️ Imprimir</button>
-    <button class="preview-btn preview-btn-pdf"   onclick="doPrint()">📄 Baixar PDF</button>
+    <button class="preview-btn preview-btn-pdf"   onclick="doPrint('color')">📄 Baixar PDF</button>
     <button class="preview-btn preview-btn-close" onclick="closePreview()">✕ Fechar</button>
   </div>
   <div id="preview-scroll">
@@ -890,6 +890,21 @@ document.getElementById('preview-modal').addEventListener('keydown', e => {
 });
 
 // ── PRÉ-VISUALIZAÇÃO ──
+let printMode = 'bw';
+
+function toggleMode() {
+  printMode = printMode === 'bw' ? 'color' : 'bw';
+  const page = document.getElementById('preview-page');
+  const btn  = document.getElementById('mode-toggle');
+  if (printMode === 'bw') {
+    page.classList.replace('color', 'bw');
+    btn.textContent = '🔲 Preto e Branco';
+  } else {
+    page.classList.replace('bw', 'color');
+    btn.textContent = '🎨 Colorido';
+  }
+}
+
 function printDashboard() {
   const page = document.getElementById('preview-page');
 
@@ -920,7 +935,7 @@ function printDashboard() {
         <span>${b.querySelector('.bar-count')?.textContent || ''}</span>
       </div>
       <div class="p-bar-track">
-        <div class="p-bar-fill" style="width:${fill?.style.width || '0%'};background:${fill?.style.background || '#C87830'}"></div>
+        <div class="p-bar-fill" style="width:${fill?.style.width || '0%'}"></div>
       </div>
     </div>`;
   }).join('');
@@ -951,6 +966,10 @@ function printDashboard() {
     <div class="p-footer">EcoBúzios — Fonte: public-stats-api</div>
   `;
 
+  printMode = 'bw';
+  page.className = 'preview-page bw';
+  document.getElementById('mode-toggle').textContent = '🔲 Preto e Branco';
+
   _focusBeforeModal = document.activeElement;
   const modal = document.getElementById('preview-modal');
   modal.classList.add('open');
@@ -963,33 +982,68 @@ function closePreview() {
   if (_focusBeforeModal) { _focusBeforeModal.focus(); _focusBeforeModal = null; }
 }
 
-function doPrint() {
+const _PRINT_BASE = `
+  @page { size: A4 portrait; margin: 10mm 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { font-family: 'Inter', sans-serif; background: #fff; color: #111; }
+  .preview-header { border-radius: 6px; padding: 8px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .preview-header img { height: 34px; border-radius: 4px; }
+  .preview-header strong { font-size: 0.85rem; display: block; }
+  .preview-header small { font-size: 0.72rem; }
+  .p-section { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom-width: 2px; border-bottom-style: solid; padding-bottom: 4px; margin-bottom: 8px; }
+  .p-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+  .p-kpi { border-radius: 6px; padding: 7px 9px; border-width: 1px; border-style: solid; }
+  .p-icon { font-size: 1rem; margin-bottom: 4px; display: block; }
+  .p-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin-bottom: 3px; }
+  .p-value { font-size: 1.3rem; font-weight: 800; color: #000; line-height: 1; }
+  .p-sub { font-size: 0.62rem; margin-top: 3px; }
+  .p-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .p-card { border-radius: 6px; padding: 8px; break-inside: avoid; border-width: 1px; border-style: solid; }
+  .p-card h3 { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; font-weight: 700; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+  .p-card img { width: 100%; height: auto; display: block; max-height: 118px; object-fit: contain; }
+  .p-bar-item { margin-bottom: 5px; }
+  .p-bar-header { display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 2px; font-weight: 600; }
+  .p-bar-track { border-radius: 3px; height: 8px; overflow: hidden; }
+  .p-bar-fill { height: 100%; border-radius: 2px; }
+  .p-footer { text-align: center; font-size: 0.58rem; margin-top: 10px; padding-top: 8px; border-top: 1px solid #ccc; }
+`;
+const _PRINT_BW = _PRINT_BASE + `
+  .preview-header { background: #111; }
+  .preview-header img { filter: brightness(0) invert(1); }
+  .preview-header strong { color: #fff; }
+  .preview-header small { color: #ccc; }
+  .p-section { color: #111; border-bottom-color: #111; }
+  .p-kpi { background: #f0f0f0; border-color: #888; }
+  .p-label { color: #333; }
+  .p-sub { color: #444; }
+  .p-card { background: #fff; border-color: #888; }
+  .p-card h3 { color: #333; }
+  .p-card img { filter: grayscale(1); }
+  .p-bar-header { color: #111; }
+  .p-bar-track { background: #ddd; border: 1px solid #bbb; }
+  .p-bar-fill { background: #333; }
+  .p-footer { color: #555; }
+`;
+const _PRINT_COLOR = _PRINT_BASE + `
+  .preview-header { background: #0D3A3D; }
+  .preview-header strong { color: #fff; }
+  .preview-header small { color: #ccc; }
+  .p-section { color: #C87830; border-bottom-color: #ddd; border-bottom-width: 1px; }
+  .p-kpi { background: #eef4f4; border-color: #b0cece; }
+  .p-label { color: #666; }
+  .p-sub { color: #777; }
+  .p-card { background: #f9fafb; border-color: #ddd; }
+  .p-card h3 { color: #666; }
+  .p-bar-header { color: #333; }
+  .p-bar-track { background: #e0ecec; }
+  .p-bar-fill { background: #C87830; }
+  .p-footer { color: #999; }
+`;
+
+function doPrint(forceMode) {
+  const mode = forceMode || printMode;
   const pageHTML = document.getElementById('preview-page').innerHTML;
-  const css = `
-    @page { size: A4 portrait; margin: 0; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #fff; padding: 15mm 12mm; }
-    .preview-header { background: #0D3A3D; border-radius: 8px; padding: 12px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-    .preview-header img { height: 48px; border-radius: 6px; }
-    .preview-header strong { color: #fff; font-size: 0.95rem; display: block; }
-    .preview-header small { color: #ccc; font-size: 0.78rem; }
-    .p-section { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #C87830; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 12px; }
-    .p-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-    .p-kpi { background: #eef4f4; border: 1px solid #b0cece; border-radius: 8px; padding: 10px 12px; }
-    .p-icon { font-size: 1.1rem; margin-bottom: 6px; display: block; }
-    .p-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .6px; color: #666; font-weight: 600; margin-bottom: 4px; }
-    .p-value { font-size: 1.5rem; font-weight: 800; color: #111; line-height: 1; }
-    .p-sub { font-size: 0.68rem; color: #777; margin-top: 4px; }
-    .p-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .p-card { background: #f9fafb; border: 1px solid #ddd; border-radius: 8px; padding: 12px; break-inside: avoid; }
-    .p-card h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: .6px; color: #666; margin-bottom: 10px; font-weight: 700; }
-    .p-card img { width: 100%; height: auto; display: block; }
-    .p-bar-item { margin-bottom: 8px; }
-    .p-bar-header { display: flex; justify-content: space-between; font-size: 0.74rem; color: #333; margin-bottom: 3px; }
-    .p-bar-track { background: #e0ecec; border-radius: 4px; height: 7px; overflow: hidden; }
-    .p-bar-fill { height: 100%; border-radius: 4px; }
-    .p-footer { text-align: center; font-size: 0.62rem; color: #999; margin-top: 20px; padding-top: 12px; border-top: 1px solid #eee; }
-  `;
+  const css = mode === 'bw' ? _PRINT_BW : _PRINT_COLOR;
 
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html>
