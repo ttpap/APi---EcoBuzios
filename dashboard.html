@@ -732,8 +732,10 @@ async function loadData(url = API_BASE) {
   const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
   const totalReunioes = d.reunioes?.total ?? 0;
   const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
-  const totalAulas = totalAulasPuras + totalReunioes;
-  const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes;
+  const totalRelatoriosMensais = d.horas_aula?.total_relatorios_enviados ?? 0;
+  const totalHorasRelatorios = d.horas_aula?.total_horas ?? 0;
+  const totalAulas = totalAulasPuras + totalReunioes + totalRelatoriosMensais;
+  const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + totalHorasRelatorios;
   const kpiData = [
     { icon:'🎓', label:'Total de Alunos',  value: total,                sub:'em turmas ativas',         accent: TEAL },
     { icon:'📚', label:'Aulas no Ano',     value: `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`, sub:`horas realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
@@ -859,9 +861,11 @@ setInterval(async () => {
     const pctPub    = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
     const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
     const totalReunioes   = d.reunioes?.total ?? 0;
-    const totalAulas      = totalAulasPuras + totalReunioes;
+    const totalRelatoriosMensais = d.horas_aula?.total_relatorios_enviados ?? 0;
+    const totalHorasRelatorios = d.horas_aula?.total_horas ?? 0;
+    const totalAulas      = totalAulasPuras + totalReunioes + totalRelatoriosMensais;
     const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
-    const totalHoras      = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes;
+    const totalHoras      = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + totalHorasRelatorios;
 
     // Atualiza todos os valores dos cards
     const values = document.querySelectorAll('#kpis .value');
