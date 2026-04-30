@@ -736,12 +736,18 @@ async function loadData(url = API_BASE) {
   const totalHorasRelatorios = d.horas_aula?.total_horas ?? 0;
   const totalAulas = totalAulasPuras + totalReunioes + totalRelatoriosMensais;
   const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + totalHorasRelatorios;
+  const freqAnual = d.frequencia?.anual ?? {};
+  const freqPct   = freqAnual.percentual_presenca != null ? freqAnual.percentual_presenca + '%' : '—';
+  const freqSub   = freqAnual.total_registros > 0
+    ? `${freqAnual.total_presencas} presenças de ${freqAnual.total_registros} esperadas`
+    : 'sem chamadas finalizadas';
   const kpiData = [
-    { icon:'🎓', label:'Total de Alunos',  value: total,                sub:'em turmas ativas',         accent: TEAL },
-    { icon:'📚', label:'Aulas no Ano',     value: `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`, sub:`horas realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
-    { icon:'📍', label:'Bairros',          value: d.bairros.length,     sub:'regiões atendidas',        accent: TEAL_LITE },
-    { icon:'🏫', label:'Escola Pública',   value: pctPub+'%',           sub:'dos alunos matriculados',  accent: ORANGE_LITE },
-    { icon:'🤝', label:'Reuniões',         value: `${totalHorasReunioes}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalReunioes} reuniões</span>`, sub:'horas de reunião registradas', accent: TEAL },
+    { icon:'🎓', label:'Total de Alunos',       value: total,                sub:'em turmas ativas',         accent: TEAL },
+    { icon:'📚', label:'Aulas no Ano',           value: `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`, sub:`horas realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
+    { icon:'📍', label:'Bairros',               value: d.bairros.length,     sub:'regiões atendidas',        accent: TEAL_LITE },
+    { icon:'🏫', label:'Escola Pública',         value: pctPub+'%',           sub:'dos alunos matriculados',  accent: ORANGE_LITE },
+    { icon:'🤝', label:'Reuniões',               value: `${totalHorasReunioes}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalReunioes} reuniões</span>`, sub:'horas de reunião registradas', accent: TEAL },
+    { icon:'✅', label:'Taxa de Frequência nas Oficinas', value: freqPct, sub: freqSub, accent: ORANGE },
   ];
 
   document.getElementById('kpis').innerHTML = kpiData.map(k => `
@@ -868,12 +874,15 @@ setInterval(async () => {
     const totalHoras      = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + totalHorasRelatorios;
 
     // Atualiza todos os valores dos cards
+    const freqAnualR = d.frequencia?.anual ?? {};
+    const freqPctR   = freqAnualR.percentual_presenca != null ? freqAnualR.percentual_presenca + '%' : '—';
     const values = document.querySelectorAll('#kpis .value');
     if (values[0]) values[0].innerHTML = total;
     if (values[1]) values[1].innerHTML = `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`;
     if (values[2]) values[2].innerHTML = d.bairros.length;
     if (values[3]) values[3].innerHTML = pctPub + '%';
     if (values[4]) values[4].innerHTML = `${totalHorasReunioes}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalReunioes} reuniões</span>`;
+    if (values[5]) values[5].innerHTML = freqPctR;
 
     document.getElementById('timestamp').textContent = 'Gerado em ' + fmtDate(d.gerado_em);
     document.getElementById('refresh-status').textContent = 'Dados atualizados em ' + fmtDate(d.gerado_em);
