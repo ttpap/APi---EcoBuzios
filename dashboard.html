@@ -673,7 +673,7 @@ function renderProjectButtons(projetos) {
     const btn = document.createElement('button');
     btn.className = 'filter-btn';
     btn.dataset.id = p.id;
-    btn.textContent = cleanProjectName(p.name);
+    btn.textContent = p.name;
     btn.setAttribute('aria-pressed', 'false');
     bar.appendChild(btn);
   });
