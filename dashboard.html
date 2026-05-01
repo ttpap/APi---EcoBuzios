@@ -5,27 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EcoBúzios — Painel de Alunos</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
       --orange:      #C87830;
       --orange-light:#E8944A;
-      --orange-dim:  #FEF0E2;
-      --teal:        #1A6065;
+      --orange-dim:  #7A4A1A;
+      --teal:        #1E6B70;
       --teal-light:  #2A8E95;
-      --teal-dim:    #D8ECED;
-      --bg:          #EEF5F5;
-      --surface:     #FFFFFF;
-      --surface2:    #E6F0F0;
-      --border:      #BDD4D5;
-      --text:        #0E2224;
-      --muted:       #4A7275;
+      --teal-dim:    #0D3A3D;
+      --bg:          #0B1A1B;
+      --surface:     #112224;
+      --surface2:    #172E30;
+      --border:      #1E3E40;
+      --text:        #E8F0F0;
+      --muted:       #7A9E9F;
+      --accent:      var(--teal);
+      --radius:      16px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -33,546 +35,416 @@
 
     /* ── HEADER ── */
     header {
-      background: var(--surface);
+      background: linear-gradient(135deg, var(--teal-dim) 0%, #0B1A1B 70%);
       border-bottom: 1px solid var(--border);
       padding: 0 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      height: 92px;
+      height: 80px;
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
     }
 
-    .logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
+    .logo-wrap { display: flex; align-items: center; gap: 14px; }
     .logo-wrap img {
-      height: 72px;
-      filter: drop-shadow(0 1px 4px rgba(14,34,36,0.22));
+      height: 56px;
+      filter: brightness(1.3);
+      mix-blend-mode: screen;
+      border-radius: 8px;
+      transition: opacity .3s;
     }
+    .logo-divider { width: 1px; height: 28px; background: var(--border); }
+    .logo-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; line-height: 1.5; }
+    .logo-label strong { display: block; color: var(--text); font-size: 0.9rem; font-weight: 700; }
 
-    .logo-divider {
-      width: 1px;
-      height: 32px;
-      background: var(--border);
-    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
 
-    .logo-label {
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-weight: 500;
-      line-height: 1.4;
-    }
-    .logo-label strong {
-      display: block;
-      color: var(--text);
-      font-size: 0.95rem;
-      font-weight: 700;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: rgba(30,107,112,.1);
-      color: var(--teal);
-      border: 1px solid rgba(30,107,112,.35);
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(30,107,112,.2);
+      color: #5ECDD3;
+      border: 1px solid rgba(94,205,211,.25);
       border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 0.74rem;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+      padding: 4px 12px;
+      font-size: 0.72rem; font-weight: 600;
     }
-    .badge::before {
-      content: '';
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--teal);
-      animation: blink 2s infinite;
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #5ECDD3;
+      animation: pulse 2s ease-in-out infinite;
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-
-    .timestamp { font-size: 0.75rem; color: var(--muted); }
-
-    /* ── MOBILE ── */
-    @media (max-width: 600px) {
-      header {
-        padding: 0 16px;
-        height: auto;
-        min-height: 60px;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-      }
-      .logo-wrap img { height: 38px; }
-      .logo-divider, .logo-label, .timestamp, .badge { display: none; }
-      .print-btn { padding: 5px 12px; font-size: 0.74rem; }
-      .filter-bar { padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
-      main { padding: 20px 12px 40px; }
-      .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .charts { grid-template-columns: 1fr; }
-      .kpi .value { font-size: 2rem; }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:.3; transform:scale(.8); }
     }
 
+    .timestamp { font-size: 0.72rem; color: var(--muted); }
 
-    /* ── MAIN ── */
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 36px 24px 48px;
+    .print-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--orange); color: #fff;
+      border: none; border-radius: 20px;
+      padding: 7px 16px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      transition: background .18s, transform .15s;
     }
-
-    /* ── KPIs ── */
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .kpi {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px 20px;
-      position: relative;
-      overflow: hidden;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .kpi:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(0,0,0,.3);
-    }
-    .kpi::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 3px;
-      background: var(--accent, var(--teal));
-    }
-    .kpi::after {
-      content: '';
-      position: absolute;
-      top: -30px; right: -30px;
-      width: 100px; height: 100px;
-      border-radius: 50%;
-      background: var(--accent, var(--teal));
-      opacity: .06;
-    }
-    .kpi .icon { font-size: 1.5rem; margin-bottom: 14px; display: block; }
-    .kpi .label {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    .kpi .value {
-      font-size: 2.6rem;
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1;
-      letter-spacing: -1px;
-    }
-    .kpi .sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
-
-    /* ── SECTION LABEL ── */
-    .section-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--orange);
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* ── CHARTS GRID ── */
-    .charts {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      transition: box-shadow .2s;
-    }
-    .card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.25); }
-
-    .card h2 {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card h2 span { font-size: 1rem; }
-
-    .chart-wrap {
-      position: relative;
-      height: 240px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* ── BAR LIST ── */
-    .bar-list { display: flex; flex-direction: column; gap: 12px; }
-    .bar-item { display: flex; flex-direction: column; gap: 5px; }
-    .bar-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.82rem;
-      color: var(--text);
-    }
-    .bar-count { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
-    .bar-track {
-      background: var(--teal-dim);
-      border-radius: 6px;
-      height: 9px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 6px;
-      transition: width 1s cubic-bezier(.4,0,.2,1);
-    }
-
-    /* ── LOADING ── */
-    #loading { text-align: center; padding: 100px 0; color: var(--muted); }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--orange);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .print-btn:hover { background: var(--orange-light); transform: translateY(-1px); }
+    .print-btn:active { transform: translateY(0); }
 
     /* ── FILTER BAR ── */
     .filter-bar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 12px 40px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      padding: 10px 40px;
+      display: flex; align-items: center; gap: 8px;
+      overflow-x: auto;
     }
+    .filter-bar::-webkit-scrollbar { height: 0; }
     .filter-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-right: 4px;
+      font-size: 0.7rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.6px; white-space: nowrap;
     }
     .filter-btn {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--muted);
       border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .18s;
-      font-family: inherit;
+      padding: 5px 16px; font-size: 0.78rem; font-weight: 500;
+      cursor: pointer; transition: all .18s; font-family: inherit;
+      white-space: nowrap; flex-shrink: 0;
     }
-    .filter-btn:hover {
-      border-color: var(--teal-light);
-      color: var(--text);
-    }
+    .filter-btn:hover { border-color: var(--teal-light); color: var(--text); }
     .filter-btn.active {
-      background: var(--teal);
-      border-color: var(--teal);
-      color: #fff;
-      font-weight: 600;
+      background: var(--teal); border-color: var(--teal);
+      color: #fff; font-weight: 600;
     }
 
-    /* ── PRINT BUTTON ── */
-    .print-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--orange);
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .18s;
+    /* ── MAIN ── */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 36px 28px 64px;
     }
-    .print-btn:hover { background: var(--orange-light); }
 
-    /* imagem substituta do gráfico — visível só em print */
-    .chart-img { display: none; width: 100%; height: auto; }
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--orange);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
 
-    /* ── PRINT STYLES ── */
+    /* ── KPIs ── */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px 18px;
+      position: relative; overflow: hidden;
+      cursor: default;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .kpi:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.35);
+      border-color: var(--kpi-accent, var(--teal));
+    }
+    .kpi-top-bar {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--kpi-accent, var(--teal));
+    }
+    .kpi-glow {
+      position: absolute; top: -40px; right: -40px;
+      width: 120px; height: 120px; border-radius: 50%;
+      background: var(--kpi-accent, var(--teal));
+      opacity: .05; pointer-events: none;
+      transition: opacity .3s;
+    }
+    .kpi:hover .kpi-glow { opacity: .1; }
+    .kpi .icon {
+      font-size: 1.3rem; margin-bottom: 12px;
+      display: block; line-height: 1;
+    }
+    .kpi .label {
+      font-size: 0.68rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+      font-weight: 600; margin-bottom: 6px;
+    }
+    .kpi .value {
+      font-size: 2.4rem; font-weight: 900;
+      color: var(--text); line-height: 1;
+      letter-spacing: -1.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi .sub { font-size: 0.74rem; color: var(--muted); margin-top: 7px; }
+
+    /* ── CHARTS GRID ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: box-shadow .2s;
+    }
+    .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.25); }
+
+    .card-title {
+      font-size: 0.68rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.8px; margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title-icon { font-size: 1rem; }
+
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* span classes */
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    /* ── BAR LIST ── */
+    .bar-list { display: flex; flex-direction: column; gap: 10px; }
+    .bar-item { display: flex; flex-direction: column; gap: 4px; }
+    .bar-header {
+      display: flex; justify-content: space-between;
+      font-size: 0.8rem; color: var(--text);
+    }
+    .bar-count { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+    .bar-track {
+      background: rgba(30,62,64,.8);
+      border-radius: 6px; height: 8px; overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 6px;
+      transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── STAT ROW (big numbers side by side) ── */
+    .stat-row {
+      display: flex; gap: 0;
+    }
+    .stat-cell {
+      flex: 1; padding: 12px 0;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-cell .s-val {
+      font-size: 1.8rem; font-weight: 800;
+      color: var(--text); line-height: 1;
+      letter-spacing: -1px;
+    }
+    .stat-cell .s-lab {
+      font-size: 0.65rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .6px;
+      margin-top: 4px; font-weight: 600;
+    }
+
+    /* ── LOADING ── */
+    #loading {
+      text-align: center; padding: 120px 0;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { font-size: 0.85rem; }
+
+    /* ── COUNTER ANIMATION ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .kpi { animation: fadeUp .4s ease both; }
+    .kpi:nth-child(1) { animation-delay: .05s; }
+    .kpi:nth-child(2) { animation-delay: .10s; }
+    .kpi:nth-child(3) { animation-delay: .15s; }
+    .kpi:nth-child(4) { animation-delay: .20s; }
+    .kpi:nth-child(5) { animation-delay: .25s; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 28px;
+      font-size: 0.7rem; color: #1E3E40;
+    }
+
+    /* ── TWEAKS PANEL ── */
+    #tweaks-panel {
+      display: none;
+      position: fixed; bottom: 24px; right: 24px;
+      z-index: 999;
+      background: #0D2426;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      width: 280px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.5);
+      font-size: 0.82rem;
+    }
+    #tweaks-panel.open { display: block; }
+    .tweaks-title {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      color: var(--orange); margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tweaks-close {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 1rem; line-height: 1;
+    }
+    .tweak-row { margin-bottom: 14px; }
+    .tweak-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+    .tweak-options { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tweak-opt {
+      padding: 4px 12px; border-radius: 12px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--muted);
+      font-size: 0.75rem; cursor: pointer; font-family: inherit;
+      transition: all .15s;
+    }
+    .tweak-opt:hover { border-color: var(--teal-light); color: var(--text); }
+    .tweak-opt.sel { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .tweak-range { width: 100%; accent-color: var(--orange); }
+
+    /* ── PRINT MODAL ── */
+    #preview-modal {
+      display: none; position: fixed; inset: 0;
+      z-index: 9999; background: rgba(0,0,0,.8);
+      backdrop-filter: blur(6px);
+      flex-direction: column;
+    }
+    #preview-modal.open { display: flex; }
+    #preview-bar {
+      background: #0D3A3D; border-bottom: 1px solid #1E3E40;
+      padding: 12px 24px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    #preview-bar span { font-size: 0.85rem; color: #7A9E9F; font-weight: 500; flex: 1; }
+    .preview-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      border: none; border-radius: 20px; padding: 8px 18px;
+      font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: opacity .18s;
+    }
+    .preview-btn:hover { opacity: .85; }
+    .preview-btn-print { background: #C87830; color: #fff; }
+    .preview-btn-close { background: #1E3E40; color: #7A9E9F; }
+    #preview-scroll {
+      flex: 1; overflow-y: auto; padding: 32px 0;
+      display: flex; flex-direction: column; align-items: center; gap: 24px;
+    }
+    .preview-page {
+      background: #fff; color: #111;
+      width: 210mm; min-height: 297mm; padding: 15mm 12mm;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+      border-radius: 4px; font-family: 'Inter', sans-serif; box-sizing: border-box;
+    }
+    .preview-page .ph { background:#0D3A3D; border-radius:8px; padding:12px 20px; display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+    .preview-page .ph img { height:48px; border-radius:6px; }
+    .preview-page .ph strong { color:#fff; font-size:0.95rem; display:block; }
+    .preview-page .ph small { color:#ccc; font-size:0.78rem; }
+    .preview-page .ps { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#C87830; border-bottom:1px solid #ddd; padding-bottom:6px; margin-bottom:12px; }
+    .preview-page .pk-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:20px; }
+    .preview-page .pk { background:#eef4f4; border:1px solid #b0cece; border-radius:8px; padding:10px; }
+    .preview-page .pk .pi { font-size:1rem; margin-bottom:4px; display:block; }
+    .preview-page .pk .pl { font-size:0.57rem; text-transform:uppercase; letter-spacing:.5px; color:#666; font-weight:600; margin-bottom:3px; }
+    .preview-page .pk .pv { font-size:1.3rem; font-weight:800; color:#111; line-height:1; }
+    .preview-page .pk .pb { font-size:0.64rem; color:#777; margin-top:3px; }
+    .preview-page .pc-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .preview-page .pc { background:#f9fafb; border:1px solid #ddd; border-radius:8px; padding:12px; }
+    .preview-page .pc h3 { font-size:0.62rem; text-transform:uppercase; letter-spacing:.5px; color:#666; margin-bottom:8px; font-weight:700; }
+    .preview-page .pc img { width:100%; height:auto; display:block; }
+    .preview-page .pbi { margin-bottom:7px; }
+    .preview-page .pbh { display:flex; justify-content:space-between; font-size:0.72rem; color:#333; margin-bottom:3px; }
+    .preview-page .pbt { background:#e0ecec; border-radius:4px; height:6px; overflow:hidden; }
+    .preview-page .pbf { height:100%; border-radius:4px; }
+    .preview-page .pfoot { text-align:center; font-size:0.6rem; color:#999; margin-top:16px; padding-top:10px; border-top:1px solid #eee; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .col-4, .col-6, .col-8 { grid-column: span 12; }
+    }
+    @media (max-width: 600px) {
+      header { padding: 0 16px; height: auto; min-height: 56px; padding: 10px 16px; }
+      .logo-wrap img { height: 36px; }
+      .logo-divider, .logo-label, .timestamp { display: none; }
+      .print-btn { padding: 5px 12px; font-size: 0.72rem; }
+      .filter-bar { padding: 10px 16px; }
+      main { padding: 20px 14px 48px; }
+      .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .kpi .value { font-size: 2rem; }
+      #tweaks-panel { width: calc(100vw - 32px); right: 16px; bottom: 16px; }
+    }
+
     @media print {
       @page { size: A4 portrait; margin: 15mm 12mm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { background: #fff !important; color: #111 !important; }
-      header {
-        background: #0D3A3D !important;
-        position: static !important;
-        padding: 12px 20px !important;
-        border-radius: 8px;
-        margin-bottom: 12px;
-      }
-      .filter-bar, .print-btn, .badge, .timestamp { display: none !important; }
-      .logo-label strong { color: #fff !important; }
-      .logo-label { color: #ccc !important; }
-      main { padding: 0 !important; }
-      .kpis {
-        display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 8px !important;
-        margin-bottom: 16px !important;
-      }
-      .kpi {
-        display: block !important;
-        background: #eef4f4 !important;
-        border: 1px solid #b0cece !important;
-        border-radius: 8px !important;
-        padding: 12px !important;
-        overflow: visible !important;
-        break-inside: avoid;
-      }
-      .kpi::before, .kpi::after { display: none !important; }
-      .kpi .icon { display: block !important; color: #333 !important; margin-bottom: 8px !important; }
+      header { background: #0D3A3D !important; position: static !important; padding: 12px 20px !important; border-radius: 8px; margin-bottom: 12px; }
+      .filter-bar, .print-btn, .live-badge, .timestamp, #tweaks-panel { display: none !important; }
+      main { padding: 0 !important; max-width: none !important; }
+      .kpis { display: grid !important; grid-template-columns: repeat(5,1fr) !important; gap: 8px !important; margin-bottom: 14px !important; }
+      .kpi { background: #eef4f4 !important; border: 1px solid #b0cece !important; border-radius: 8px !important; padding: 10px !important; animation: none !important; }
+      .kpi .value { font-size: 1.5rem !important; color: #111 !important; }
       .kpi .label { color: #555 !important; }
-      .kpi .value { font-size: 1.8rem !important; color: #111 !important; }
       .kpi .sub { color: #666 !important; }
-      .section-label { color: #C87830 !important; border-color: #ddd !important; }
-      .charts {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-      }
-      .card {
-        background: #f9fafb !important;
-        border: 1px solid #ddd !important;
-        border-radius: 8px !important;
-        padding: 14px !important;
-        break-inside: avoid;
-      }
-      .card h2 { color: #555 !important; }
-      /* esconde canvas, mostra imagem */
+      .kpi-top-bar, .kpi-glow { display: none !important; }
+      .section-label { color: #C87830 !important; }
+      .section-label::after { background: #ddd !important; }
+      .charts-grid { display: grid !important; grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+      .col-4, .col-6, .col-8, .col-12 { grid-column: span 1 !important; }
+      .card { background: #f9fafb !important; border: 1px solid #ddd !important; border-radius: 8px !important; padding: 12px !important; break-inside: avoid; }
+      .card-title { color: #555 !important; }
       canvas { display: none !important; }
-      .chart-img { display: block !important; }
+      .chart-img { display: block !important; width: 100%; height: auto; }
       .chart-wrap { height: auto !important; }
       .bar-track { background: #e0ecec !important; }
-      .bar-count { color: #444 !important; }
-      .bar-header { color: #222 !important; }
-      footer { color: #999 !important; font-size: 0.65rem !important; padding: 8px !important; }
     }
-
-    /* ── FOOTER ── */
-    footer {
-      text-align: center;
-      padding: 24px;
-      font-size: 0.73rem;
-      color: var(--muted);
-    }
-
-    /* ── ACESSIBILIDADE ── */
-    .skip-link {
-      position: absolute;
-      top: -40px;
-      left: 0;
-      background: var(--orange);
-      color: #fff;
-      padding: 8px 16px;
-      z-index: 99999;
-      border-radius: 0 0 8px 0;
-      font-weight: 600;
-      font-size: 0.85rem;
-      text-decoration: none;
-      transition: top .15s;
-    }
-    .skip-link:focus { top: 0; }
-
-    .sr-only {
-      position: absolute;
-      width: 1px; height: 1px;
-      padding: 0; margin: -1px;
-      overflow: hidden;
-      clip: rect(0,0,0,0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    :focus-visible {
-      outline: 2px solid var(--orange);
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
-
-    /* ── PRINT PREVIEW MODAL ── */
-    #preview-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: rgba(0,0,0,.75);
-      backdrop-filter: blur(4px);
-      flex-direction: column;
-    }
-    #preview-modal.open { display: flex; }
-
-    #preview-bar {
-      background: #0D3A3D;
-      border-bottom: 1px solid #1E3E40;
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-    #preview-bar span {
-      font-size: 0.85rem;
-      color: #7A9E9F;
-      font-weight: 500;
-      flex: 1;
-    }
-    .preview-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      border: none;
-      border-radius: 20px;
-      padding: 8px 18px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: opacity .18s;
-    }
-    .preview-btn:hover { opacity: .85; }
-    .preview-btn-print  { background: #C87830; color: #fff; }
-    .preview-btn-pdf    { background: #1E6B70; color: #fff; }
-    .preview-btn-close  { background: #1E3E40; color: #7A9E9F; }
-    .preview-btn-toggle { background: #2A2A2A; color: #ccc; border: 1px solid #555; }
-
-    #preview-scroll {
-      flex: 1;
-      overflow-y: auto;
-      padding: 32px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-    }
-
-    .preview-page {
-      background: #fff;
-      color: #111;
-      width: 210mm;
-      min-height: 297mm;
-      padding: 15mm 12mm;
-      box-shadow: 0 8px 40px rgba(0,0,0,.5);
-      border-radius: 4px;
-      font-family: 'Inter', sans-serif;
-      box-sizing: border-box;
-    }
-
-    /* ── PRINT PREVIEW — layout compartilhado ── */
-    .preview-page .preview-header { border-radius: 6px; padding: 8px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .preview-page .preview-header img { height: 34px; border-radius: 4px; }
-    .preview-page .preview-header strong { font-size: 0.85rem; display: block; }
-    .preview-page .preview-header small { font-size: 0.72rem; }
-    .preview-page .p-section { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom-width: 2px; border-bottom-style: solid; padding-bottom: 4px; margin-bottom: 8px; }
-    .preview-page .p-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
-    .preview-page .p-kpi { border-radius: 6px; padding: 7px 9px; border-width: 1px; border-style: solid; }
-    .preview-page .p-kpi .p-icon { font-size: 1rem; margin-bottom: 4px; display: block; }
-    .preview-page .p-kpi .p-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin-bottom: 3px; }
-    .preview-page .p-kpi .p-value { font-size: 1.3rem; font-weight: 800; color: #000; line-height: 1; }
-    .preview-page .p-kpi .p-sub { font-size: 0.62rem; margin-top: 3px; }
-    .preview-page .p-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .preview-page .p-card { border-radius: 6px; padding: 8px; border-width: 1px; border-style: solid; }
-    .preview-page .p-card h3 { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; font-weight: 700; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
-    .preview-page .p-card img { width: 100%; height: auto; display: block; max-height: 118px; object-fit: contain; }
-    .preview-page .p-bar-item { margin-bottom: 5px; }
-    .preview-page .p-bar-header { display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 2px; font-weight: 600; }
-    .preview-page .p-bar-track { border-radius: 3px; height: 8px; overflow: hidden; }
-    .preview-page .p-bar-fill { height: 100%; border-radius: 2px; }
-    .preview-page .p-footer { text-align: center; font-size: 0.58rem; margin-top: 10px; padding-top: 8px; border-top: 1px solid #ccc; }
-
-    /* ── Modo P&B ── */
-    .preview-page.bw .preview-header { background: #111; }
-    .preview-page.bw .preview-header img { filter: brightness(0) invert(1); }
-    .preview-page.bw .preview-header strong { color: #fff; }
-    .preview-page.bw .preview-header small { color: #ccc; }
-    .preview-page.bw .p-section { color: #111; border-bottom-color: #111; }
-    .preview-page.bw .p-kpi { background: #f0f0f0; border-color: #888; }
-    .preview-page.bw .p-kpi .p-label { color: #333; }
-    .preview-page.bw .p-kpi .p-sub { color: #444; }
-    .preview-page.bw .p-card { background: #fff; border-color: #888; }
-    .preview-page.bw .p-card h3 { color: #333; }
-    .preview-page.bw .p-card img { filter: grayscale(1); }
-    .preview-page.bw .p-bar-header { color: #111; }
-    .preview-page.bw .p-bar-track { background: #ddd; border: 1px solid #bbb; }
-    .preview-page.bw .p-bar-fill { background: #333; }
-    .preview-page.bw .p-footer { color: #555; }
-
-    /* ── Modo Colorido ── */
-    .preview-page.color .preview-header { background: #0D3A3D; }
-    .preview-page.color .preview-header img { filter: none; }
-    .preview-page.color .preview-header strong { color: #fff; }
-    .preview-page.color .preview-header small { color: #ccc; }
-    .preview-page.color .p-section { color: #C87830; border-bottom-color: #ddd; border-bottom-width: 1px; }
-    .preview-page.color .p-kpi { background: #eef4f4; border-color: #b0cece; }
-    .preview-page.color .p-kpi .p-label { color: #666; }
-    .preview-page.color .p-kpi .p-sub { color: #777; }
-    .preview-page.color .p-card { background: #f9fafb; border-color: #ddd; }
-    .preview-page.color .p-card h3 { color: #666; }
-    .preview-page.color .p-card img { filter: none; }
-    .preview-page.color .p-bar-header { color: #333; }
-    .preview-page.color .p-bar-track { background: #e0ecec; }
-    .preview-page.color .p-bar-fill { background: #C87830; }
-    .preview-page.color .p-footer { color: #999; }
+    .chart-img { display: none; }
   </style>
 </head>
 <body>
 
-<a href="#main" class="skip-link">Pular para conteúdo principal</a>
-<div id="refresh-status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
-
-<!-- ── MODAL DE PRÉ-VISUALIZAÇÃO ── -->
-<div id="preview-modal" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
+<!-- PRINT MODAL -->
+<div id="preview-modal">
   <div id="preview-bar">
-    <span id="preview-modal-title">Pré-visualização de impressão</span>
-    <button class="preview-btn preview-btn-toggle" id="mode-toggle" onclick="toggleMode()">🔲 Preto e Branco</button>
-    <button class="preview-btn preview-btn-print" onclick="doPrint()">🖨️ Imprimir</button>
-    <button class="preview-btn preview-btn-pdf"   onclick="doPrint('color')">📄 Baixar PDF</button>
+    <span>Pré-visualização de impressão</span>
+    <button class="preview-btn preview-btn-print" onclick="doPrint()">🖨️ Imprimir / Baixar PDF</button>
     <button class="preview-btn preview-btn-close" onclick="closePreview()">✕ Fechar</button>
   </div>
   <div id="preview-scroll">
@@ -580,9 +452,48 @@
   </div>
 </div>
 
+<!-- TWEAKS PANEL -->
+<div id="tweaks-panel">
+  <div class="tweaks-title">
+    Tweaks
+    <button class="tweaks-close" onclick="hideTweaks()">✕</button>
+  </div>
+  <div class="tweak-row">
+    <div class="tweak-label">Tema de cor</div>
+    <div class="tweak-options">
+      <button class="tweak-opt sel" data-tweak="theme" data-val="dark" onclick="setTweak('theme',this)">Escuro</button>
+      <button class="tweak-opt" data-tweak="theme" data-val="teal" onclick="setTweak('theme',this)">Teal</button>
+      <button class="tweak-opt" data-tweak="theme" data-val="warm" onclick="setTweak('theme',this)">Quente</button>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <div class="tweak-label">Atualização automática</div>
+    <div class="tweak-options">
+      <button class="tweak-opt" data-tweak="refresh" data-val="5" onclick="setTweak('refresh',this)">5s</button>
+      <button class="tweak-opt sel" data-tweak="refresh" data-val="30" onclick="setTweak('refresh',this)">30s</button>
+      <button class="tweak-opt" data-tweak="refresh" data-val="60" onclick="setTweak('refresh',this)">1min</button>
+      <button class="tweak-opt" data-tweak="refresh" data-val="0" onclick="setTweak('refresh',this)">Off</button>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <div class="tweak-label">Densidade do layout</div>
+    <div class="tweak-options">
+      <button class="tweak-opt sel" data-tweak="density" data-val="normal" onclick="setTweak('density',this)">Normal</button>
+      <button class="tweak-opt" data-tweak="density" data-val="compact" onclick="setTweak('density',this)">Compacto</button>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <div class="tweak-label">Animação de contadores</div>
+    <div class="tweak-options">
+      <button class="tweak-opt sel" data-tweak="counters" data-val="on" onclick="setTweak('counters',this)">On</button>
+      <button class="tweak-opt" data-tweak="counters" data-val="off" onclick="setTweak('counters',this)">Off</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="logo-wrap">
-    <img src="logo-ecobuzios-transparent.png" alt="EcoBúzios" />
+    <img id="logo-img" src="logo%20EcoBuzios.png" alt="EcoBúzios" />
     <div class="logo-divider"></div>
     <div class="logo-label">
       <strong>Painel de Alunos</strong>
@@ -590,485 +501,451 @@
     </div>
   </div>
   <div class="header-right">
-    <button class="print-btn" onclick="printDashboard()">🖨️ Imprimir / PDF</button>
-    <span class="badge" id="status-badge">Carregando…</span>
     <span class="timestamp" id="timestamp"></span>
+    <div class="live-badge"><div class="live-dot"></div><span id="status-text">Carregando</span></div>
+    <button class="print-btn" onclick="printDashboard()">🖨️ Imprimir</button>
   </div>
 </header>
 
-<div class="filter-bar" id="filter-bar" role="group" aria-label="Filtrar por projeto">
-  <span class="filter-label" aria-hidden="true">Projeto:</span>
-  <button class="filter-btn active" data-id="" aria-pressed="true">Todos</button>
+<div class="filter-bar" id="filter-bar">
+  <span class="filter-label">Projeto:</span>
+  <button class="filter-btn active" data-id="">Todos</button>
 </div>
 
-<main id="main">
+<main>
   <div id="loading">
     <div class="spinner"></div>
-    Buscando dados da API…
+    <p>Buscando dados da API…</p>
   </div>
 
-  <div id="content" style="display:none;">
+  <div id="content" style="display:none">
     <div class="section-label">Indicadores principais</div>
     <div class="kpis" id="kpis"></div>
 
-    <div class="section-label" style="margin-top:32px;">Análises detalhadas</div>
-    <div class="charts" id="charts"></div>
+    <div class="section-label" style="margin-top:36px">Análises detalhadas</div>
+    <div class="charts-grid" id="charts"></div>
   </div>
 </main>
 
 <footer>EcoBúzios &mdash; Fonte: public-stats-api &mdash; Atualizado a cada carregamento</footer>
 
 <script>
-const API_BASE  = 'https://ixgujnhdjrgoakqzdkgx.supabase.co/functions/v1/public-stats-api';
-const API_KEY   = 'c04248b422b59e718e8115a66286b1f9a56f5f447b44354128ad7406ebb50752';
-const ORANGE      = '#C87830';
-const ORANGE_LITE = '#E8944A';
-const TEAL        = '#1E6B70';
-const TEAL_LITE   = '#2A8E95';
-const PALETTE     = ['#C87830','#1E6B70','#E8944A','#2A8E95','#A05A20','#0D3A3D','#F0A860','#5ECDD3','#7A4A1A','#3AACB4','#D4A060','#144C50'];
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "dark",
+  "refresh": "30",
+  "density": "normal",
+  "counters": "on"
+}/*EDITMODE-END*/;
+
+let tweaks = { ...TWEAK_DEFAULTS };
+
+// Tweaks toggle via host
+window.addEventListener('message', e => {
+  if (e.data?.type === '__activate_edit_mode') showTweaks();
+  if (e.data?.type === '__deactivate_edit_mode') hideTweaks();
+});
+window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+function showTweaks() { document.getElementById('tweaks-panel').classList.add('open'); }
+function hideTweaks() { document.getElementById('tweaks-panel').classList.remove('open'); }
+
+function setTweak(key, btn) {
+  tweaks[key] = btn.dataset.val;
+  btn.closest('.tweak-options').querySelectorAll('.tweak-opt').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  applyTweaks();
+  window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: tweaks[key] } }, '*');
+}
+
+function applyTweaks() {
+  // Theme
+  const root = document.documentElement;
+  if (tweaks.theme === 'teal') {
+    root.style.setProperty('--bg', '#071618');
+    root.style.setProperty('--surface', '#0C2224');
+    root.style.setProperty('--surface2', '#112A2D');
+  } else if (tweaks.theme === 'warm') {
+    root.style.setProperty('--bg', '#1A100B');
+    root.style.setProperty('--surface', '#241610');
+    root.style.setProperty('--surface2', '#2E1E12');
+  } else {
+    root.style.setProperty('--bg', '#0B1A1B');
+    root.style.setProperty('--surface', '#112224');
+    root.style.setProperty('--surface2', '#172E30');
+  }
+  // Density
+  if (tweaks.density === 'compact') {
+    root.style.setProperty('--radius', '10px');
+    document.querySelectorAll('.kpi').forEach(el => el.style.padding = '14px 16px 12px');
+    document.querySelectorAll('.card').forEach(el => el.style.padding = '14px');
+  } else {
+    root.style.setProperty('--radius', '16px');
+    document.querySelectorAll('.kpi').forEach(el => el.style.padding = '');
+    document.querySelectorAll('.card').forEach(el => el.style.padding = '');
+  }
+  // Refresh
+  setupAutoRefresh();
+}
+
+// ── DATA ──
+const API_BASE = 'https://ixgujnhdjrgoakqzdkgx.supabase.co/functions/v1/public-stats-api';
+const API_KEY  = 'c04248b422b59e718e8115a66286b1f9a56f5f447b44354128ad7406ebb50752';
+const ORANGE   = '#C87830', ORANGE_L = '#E8944A';
+const TEAL     = '#1E6B70', TEAL_L   = '#2A8E95';
+const PALETTE  = ['#C87830','#1E6B70','#E8944A','#2A8E95','#A05A20','#3AACB4','#F0A860','#5ECDD3','#7A4A1A','#144C50','#D4A060','#0D3A3D'];
 
 let activeProjectId = '';
 let chartInstances  = [];
-
-function makeChartImg(canvas) {
-  const existing = canvas.parentNode.querySelector('.chart-img');
-  if (existing) existing.remove();
-  const img = document.createElement('img');
-  img.className = 'chart-img';
-  img.src = canvas.toDataURL('image/png');
-  canvas.parentNode.appendChild(img);
-}
+let refreshTimer    = null;
 
 const LOGOS = {
-  '':                                         'logo-ecobuzios-transparent.png',
-  '2dc4ea41-e0f4-4084-bb64-2b414bf72cbc':    'logo-ecobuzios-transparent.png',
-  '1608708a-969d-418a-be08-5c61154046c3':    'logo%20CircoLo.jpg',
-  '1274b28c-5772-448e-95af-547b841cb187':    'logo-ecobuzios-transparent.png',
+  '': 'logo%20EcoBuzios.png',
+  '2dc4ea41-e0f4-4084-bb64-2b414bf72cbc': 'logo%20EcoBuzios.png',
+  '1608708a-969d-418a-be08-5c61154046c3': 'logo%20CircoLo.jpg',
+  '1274b28c-5772-448e-95af-547b841cb187': 'logo%20EcoBuzios.png',
 };
 
-// Mapeia nomes do banco para nomes limpos exibidos na interface
-const PROJECT_NAMES = {
-  '1274b28c-5772-448e-95af-547b841cb187': 'CircoLo Social',
-  '04bef2d1-42e5-4a24-81db-926253db7f1a': 'Tenis de Mesa',
-  '1608708a-969d-418a-be08-5c61154046c3': 'CircoLo Centro',
-};
-function cleanProjectName(name) {
-  const found = Object.values(PROJECT_NAMES).find(n => name.includes(n.split(' ')[0]));
-  return found || name.replace(' (migração)', '').replace(' (2025-2026)', '').replace(' - Centro', '');
+function cleanName(name) {
+  return name.replace(' (migração)', '').replace(' (2025-2026)', '').replace(' - Centro', '').trim();
 }
-
 function fmtDate(iso) {
-  return new Date(iso).toLocaleString('pt-BR', { dateStyle:'medium', timeStyle:'short' });
+  return new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 }
-function pct(v, total) { return total ? Math.round(v / total * 100) : 0; }
+function pct(v, t) { return t ? Math.round(v / t * 100) : 0; }
 
-Chart.defaults.color = '#4A7275';
-
-// Lista de projetos com IDs reais do banco
-function renderProjectButtons(projetos) {
-  const bar = document.getElementById('filter-bar');
-  // Remove botões anteriores (exceto "Todos")
-  bar.querySelectorAll('.filter-btn:not([data-id=""])').forEach(b => b.remove());
-  projetos.forEach(p => {
-    const btn = document.createElement('button');
-    btn.className = 'filter-btn';
-    btn.dataset.id = p.id;
-    btn.textContent = p.name;
-    btn.setAttribute('aria-pressed', 'false');
-    bar.appendChild(btn);
-  });
-  bindFilterButtons();
+// Animated counter
+function animateCounter(el, target, isFloat) {
+  if (tweaks.counters === 'off') { el.textContent = target; return; }
+  const duration = 900, start = performance.now();
+  const from = 0;
+  const step = ts => {
+    const p = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const cur = from + (target - from) * ease;
+    el.textContent = Number.isInteger(target)
+      ? Math.round(cur).toLocaleString('pt-BR')
+      : cur.toFixed(1).replace('.', ',');
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = Number.isInteger(target) ? target.toLocaleString('pt-BR') : target.toFixed(1).replace('.', ',');
+  };
+  requestAnimationFrame(step);
 }
 
-function bindFilterButtons() {
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      activeProjectId = btn.dataset.id;
-      document.querySelector('.logo-wrap img').src = LOGOS[activeProjectId] || LOGOS[''];
-      reloadData();
-    });
-  });
+function makeChartImg(canvas) {
+  let img = canvas.parentNode.querySelector('.chart-img');
+  if (!img) { img = document.createElement('img'); img.className = 'chart-img'; canvas.parentNode.appendChild(img); }
+  img.src = canvas.toDataURL('image/png');
 }
-bindFilterButtons();
 
-function destroyCharts() {
-  chartInstances.forEach(c => c.destroy());
-  chartInstances = [];
-}
+function destroyCharts() { chartInstances.forEach(c => c.destroy()); chartInstances = []; }
 
 function showLoading() {
   document.getElementById('loading').style.display = 'block';
   document.getElementById('content').style.display = 'none';
 }
 
-function reloadData() {
-  destroyCharts();
-  showLoading();
-  const url = activeProjectId ? `${API_BASE}?projetos=${activeProjectId}` : API_BASE;
-  loadData(url);
+function renderProjectButtons(projetos) {
+  const bar = document.getElementById('filter-bar');
+  bar.querySelectorAll('.filter-btn:not([data-id=""])').forEach(b => b.remove());
+  projetos.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.id = p.id;
+    btn.textContent = p.name;
+    bar.appendChild(btn);
+  });
+  bindFilters();
+}
+
+function bindFilters() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeProjectId = btn.dataset.id;
+      document.getElementById('logo-img').src = LOGOS[activeProjectId] || LOGOS[''];
+      destroyCharts(); showLoading();
+      loadData(activeProjectId ? `${API_BASE}?projetos=${activeProjectId}` : API_BASE);
+    };
+  });
+}
+bindFilters();
+
+function setupAutoRefresh() {
+  clearInterval(refreshTimer);
+  const secs = parseInt(tweaks.refresh);
+  if (secs > 0) {
+    refreshTimer = setInterval(() => silentRefresh(), secs * 1000);
+  }
+}
+
+async function silentRefresh() {
+  try {
+    const url = activeProjectId ? `${API_BASE}?projetos=${activeProjectId}` : API_BASE;
+    const d = await fetch(url, { headers: { 'x-api-key': API_KEY } }).then(r => r.json());
+    if (!d.ok) return;
+    const total = d.total_alunos_em_turmas;
+    const pctPub = pct((d.instituicao.find(i => i.name === 'Pública') || { value: 0 }).value, total);
+    const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
+    const totalReunioes = d.reunioes?.total ?? 0;
+    const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
+    const totalAulas = totalAulasPuras + totalReunioes;
+    const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes;
+    const vals = document.querySelectorAll('#kpis .value');
+    if (vals[0]) vals[0].textContent = total.toLocaleString('pt-BR');
+    if (vals[1]) vals[1].innerHTML = `${totalHoras}h <span style="font-size:1rem;opacity:.5;font-weight:500">/ ${totalAulas} aulas</span>`;
+    if (vals[2]) vals[2].textContent = d.bairros.length;
+    if (vals[3]) vals[3].textContent = pctPub + '%';
+    if (vals[4]) vals[4].innerHTML = `${totalHorasReunioes}h <span style="font-size:1rem;opacity:.5;font-weight:500">/ ${totalReunioes} reuniões</span>`;
+    if (vals[5]) vals[5].textContent = (d.frequencia?.anual?.percentual_presenca ?? 0).toFixed(1).replace('.', ',');
+    document.getElementById('timestamp').textContent = fmtDate(d.gerado_em);
+  } catch (_) {}
 }
 
 async function loadData(url = API_BASE) {
-  const res   = await fetch(url, { headers: { 'x-api-key': API_KEY } });
-  const d     = await res.json();
-  const total = d.total_alunos_em_turmas;
-
-  const badge = document.getElementById('status-badge');
-  badge.textContent = d.ok ? 'API Online' : 'Erro';
-  document.getElementById('timestamp').textContent = 'Gerado em ' + fmtDate(d.gerado_em);
-
-  // Renderiza botões de projeto dinamicamente a cada carga (reflete projetos ativos do banco)
-  if (d.projetos_lista) {
-    renderProjectButtons(d.projetos_lista);
-  }
-
-  const pctPub   = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
-  const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
-  const totalReunioes = d.reunioes?.total ?? 0;
-  const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
-  const totalRelatoriosMensais = d.horas_aula?.total_relatorios_enviados ?? 0;
-  const totalHorasRelatorios = d.horas_aula?.total_horas ?? 0;
-  const totalAulas = totalAulasPuras + totalReunioes + totalRelatoriosMensais;
-  const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + totalHorasRelatorios;
-  const freqAnual = d.frequencia?.anual ?? {};
-  const freqPct   = freqAnual.percentual_presenca != null ? freqAnual.percentual_presenca + '%' : '—';
-  const freqSub   = freqAnual.total_registros > 0
-    ? `${freqAnual.total_presencas} presenças de ${freqAnual.total_registros} esperadas`
-    : 'sem chamadas finalizadas';
-  const kpiData = [
-    { icon:'🎓', label:'Total de Alunos',       value: total,                sub:'em turmas ativas',         accent: TEAL },
-    { icon:'📚', label:'Aulas no Ano',           value: `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`, sub:`horas realizadas em ${d.frequencia?.ano ?? ''}`,  accent: ORANGE },
-    { icon:'📍', label:'Bairros',               value: d.bairros.length,     sub:'regiões atendidas',        accent: TEAL_LITE },
-    { icon:'🏫', label:'Escola Pública',         value: pctPub+'%',           sub:'dos alunos matriculados',  accent: ORANGE_LITE },
-    { icon:'🤝', label:'Reuniões',               value: `${totalHorasReunioes}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalReunioes} reuniões</span>`, sub:'horas de reunião registradas', accent: TEAL },
-    { icon:'✅', label:'Taxa de Frequência nas Oficinas', value: freqPct, sub: freqSub, accent: ORANGE },
-  ];
-
-  document.getElementById('kpis').innerHTML = kpiData.map(k => `
-    <div class="kpi" style="--accent:${k.accent}" role="region" aria-label="${k.label}">
-      <span class="icon" aria-hidden="true">${k.icon}</span>
-      <div class="label">${k.label}</div>
-      <div class="value">${k.value}</div>
-      <div class="sub">${k.sub}</div>
-    </div>`).join('');
-
-  const c = document.getElementById('charts');
-  c.innerHTML = `
-    <div class="card">
-      <h2><span aria-hidden="true">📊</span> Alunos por Projeto</h2>
-      <div class="chart-wrap"><canvas id="cProjeto"></canvas></div>
-    </div>
-    <div class="card">
-      <h2><span aria-hidden="true">🏫</span> Tipo de Instituição</h2>
-      <div class="chart-wrap"><canvas id="cInst"></canvas></div>
-    </div>
-    <div class="card">
-      <h2><span aria-hidden="true">📅</span> Faixa Etária</h2>
-      <div class="chart-wrap"><canvas id="cIdade"></canvas></div>
-    </div>
-    <div class="card">
-      <h2><span aria-hidden="true">📍</span> Distribuição por Bairro</h2>
-      <div class="bar-list" id="bairroList"></div>
-    </div>`;
-
-  const doughnut = (id, labels, values, colors) => {
-    const canvas = document.getElementById(id);
-    const summary = labels.map((l,i) => `${l}: ${values[i]}`).join(', ');
-    canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', `Gráfico de rosca — ${summary}`);
-    const ch = new Chart(canvas, {
-      type: 'doughnut',
-      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#FFFFFF', hoverOffset: 10 }] },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '68%',
-        plugins: {
-          legend: { position:'right', labels:{ color:'#4A7275', font:{size:12}, boxWidth:13, padding:12 } },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${pct(ctx.parsed,total)}%)` } }
-        },
-        animation: { onComplete: () => makeChartImg(canvas) }
-      }
-    });
-    chartInstances.push(ch);
-    return ch;
-  };
-
-  doughnut('cProjeto', d.por_projeto.map(p=>cleanProjectName(p.name)), d.por_projeto.map(p=>p.value), [ORANGE, TEAL]);
-  doughnut('cInst',    d.instituicao.map(i=>i.name),  d.instituicao.map(i=>i.value), [TEAL, ORANGE, ORANGE_LITE]);
-
-  const order  = ['Até 10','11 – 14','15 – 17','18 – 24','25 – 35','36+'];
-  const sorted = order.map(n => d.idades.find(i=>i.name===n)||{name:n,value:0});
-
-  const idadeCanvas = document.getElementById('cIdade');
-  const idadeSummary = sorted.map(i => `${i.name}: ${i.value} alunos`).join(', ');
-  idadeCanvas.setAttribute('role', 'img');
-  idadeCanvas.setAttribute('aria-label', `Gráfico de barras — Faixa etária: ${idadeSummary}`);
-  const idadeChart = new Chart(idadeCanvas, {
-    type: 'bar',
-    data: {
-      labels: sorted.map(i=>i.name),
-      datasets: [{ label:'Alunos', data: sorted.map(i=>i.value),
-        backgroundColor: [ORANGE,'#1E6B70','#E8944A','#2A8E95','#A05A20','#3AACB4'],
-        borderRadius: 8, borderSkipped: false }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display:false },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} aluno${ctx.parsed.y!==1?'s':''}` } }
-      },
-      scales: {
-        x: { ticks:{ color:'#4A7275' }, grid:{ color:'#C8DEDE' } },
-        y: { ticks:{ color:'#4A7275', precision:0 }, grid:{ color:'#DAEAEA' }, beginAtZero:true }
-      },
-      animation: { onComplete: () => makeChartImg(idadeCanvas) }
-    }
-  });
-  chartInstances.push(idadeChart);
-
-  const bairros = [...d.bairros].sort((a,b)=>b.value-a.value);
-  const max     = bairros[0].value;
-  document.getElementById('bairroList').innerHTML = bairros.map((b,i) => `
-    <div class="bar-item">
-      <div class="bar-header">
-        <span>${b.name}</span>
-        <span class="bar-count">${b.value} aluno${b.value!==1?'s':''}</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${Math.round(b.value/max*100)}%;background:${PALETTE[i%PALETTE.length]}"></div>
-      </div>
-    </div>`).join('');
-
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('content').style.display = 'block';
-}
-
-loadData().catch(err => {
-  document.getElementById('loading').innerHTML = `<p style="color:#C87830">Erro ao carregar: ${err.message}</p>`;
-});
-
-// Auto-atualização silenciosa a cada 5 segundos
-setInterval(async () => {
   try {
-    const url = activeProjectId ? `${API_BASE}?projetos=${activeProjectId}` : API_BASE;
-    const res  = await fetch(url, { headers: { 'x-api-key': API_KEY } });
-    const d    = await res.json();
-    if (!d.ok) return;
+    const res = await fetch(url, { headers: { 'x-api-key': API_KEY } });
+    const d   = await res.json();
 
-    const total     = d.total_alunos_em_turmas;
-    const pctPub    = pct((d.instituicao.find(i=>i.name==='Pública')||{value:0}).value, total);
+    document.getElementById('status-text').textContent = d.ok ? 'Ao vivo' : 'Erro';
+    document.getElementById('timestamp').textContent = fmtDate(d.gerado_em);
+    if (d.projetos_lista) renderProjectButtons(d.projetos_lista);
+
+    const total = d.total_alunos_em_turmas;
+    const pctPub = pct((d.instituicao.find(i => i.name === 'Pública') || { value: 0 }).value, total);
     const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
     const totalReunioes   = d.reunioes?.total ?? 0;
-    const totalRelatoriosMensais = d.horas_aula?.total_relatorios_enviados ?? 0;
-    const totalHorasRelatorios = d.horas_aula?.total_horas ?? 0;
-    const totalAulas      = totalAulasPuras + totalReunioes + totalRelatoriosMensais;
     const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
-    const totalHoras      = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + totalHorasRelatorios;
+    const totalAulas = totalAulasPuras + totalReunioes;
+    const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes;
 
-    // Atualiza todos os valores dos cards
-    const freqAnualR = d.frequencia?.anual ?? {};
-    const freqPctR   = freqAnualR.percentual_presenca != null ? freqAnualR.percentual_presenca + '%' : '—';
-    const values = document.querySelectorAll('#kpis .value');
-    if (values[0]) values[0].innerHTML = total;
-    if (values[1]) values[1].innerHTML = `${totalHoras}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalAulas} aulas</span>`;
-    if (values[2]) values[2].innerHTML = d.bairros.length;
-    if (values[3]) values[3].innerHTML = pctPub + '%';
-    if (values[4]) values[4].innerHTML = `${totalHorasReunioes}h <span style="font-size:1rem;opacity:.6;font-weight:500">/ ${totalReunioes} reuniões</span>`;
-    if (values[5]) values[5].innerHTML = freqPctR;
+    const taxaFreq = d.frequencia?.anual?.percentual_presenca ?? 0;
 
-    document.getElementById('timestamp').textContent = 'Gerado em ' + fmtDate(d.gerado_em);
-    document.getElementById('refresh-status').textContent = 'Dados atualizados em ' + fmtDate(d.gerado_em);
-  } catch (_) {}
-}, 5000);
+    const kpiData = [
+      { icon: '🎓', label: 'Total de Alunos', value: total, sub: 'em turmas ativas', accent: TEAL, animate: true },
+      { icon: '📚', label: 'Aulas no Ano',    value: totalHoras, valueSub: `/ ${totalAulas} aulas`, suffix: 'h', sub: `horas realizadas em ${d.frequencia?.ano ?? ''}`, accent: ORANGE, animate: true },
+      { icon: '📍', label: 'Bairros',         value: d.bairros.length, sub: 'regiões atendidas', accent: TEAL_L, animate: true },
+      { icon: '🏫', label: 'Escola Pública',  value: pctPub, suffix: '%', sub: 'dos alunos matriculados', accent: ORANGE_L, animate: true },
+      { icon: '🤝', label: 'Reuniões',        value: totalHorasReunioes, valueSub: `/ ${totalReunioes} reuniões`, suffix: 'h', sub: 'horas de reunião registradas', accent: TEAL, animate: true },
+      { icon: '📋', label: 'Taxa de Frequência', value: taxaFreq, suffix: '%', sub: `${(d.frequencia?.anual?.total_presencas ?? 0).toLocaleString('pt-BR')} presenças registradas`, accent: '#3AACB4', animate: true },
+    ];
 
-// ── ACESSIBILIDADE MODAL ──
-let _focusBeforeModal = null;
+    document.getElementById('kpis').innerHTML = kpiData.map((k, i) => `
+      <div class="kpi" style="--kpi-accent:${k.accent}; animation-delay:${i * 0.06}s">
+        <div class="kpi-top-bar"></div>
+        <div class="kpi-glow"></div>
+        <span class="icon">${k.icon}</span>
+        <div class="label">${k.label}</div>
+        <div class="value">
+          <span class="counter-val" data-target="${k.value}">${k.value.toLocaleString('pt-BR')}</span>${k.suffix ? k.suffix : ''}
+          ${k.valueSub ? `<span style="font-size:.9rem;opacity:.45;font-weight:500;margin-left:4px">${k.valueSub}</span>` : ''}
+        </div>
+        <div class="sub">${k.sub}</div>
+      </div>`).join('');
 
-document.getElementById('preview-modal').addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closePreview(); return; }
-  if (e.key !== 'Tab') return;
-  const modal = document.getElementById('preview-modal');
-  const focusable = [...modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')];
-  const first = focusable[0], last = focusable[focusable.length - 1];
-  if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
-  else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
-});
+    // Animate counters
+    document.querySelectorAll('.counter-val').forEach(el => {
+      animateCounter(el, parseFloat(el.dataset.target), false);
+    });
 
-// ── PRÉ-VISUALIZAÇÃO ──
-let printMode = 'bw';
+    // Build charts
+    const cc = document.getElementById('charts');
+    cc.innerHTML = `
+      <div class="card col-6">
+        <div class="card-title"><span class="card-title-icon">📊</span> Alunos por Projeto</div>
+        <div class="chart-wrap"><canvas id="cProjeto"></canvas></div>
+      </div>
+      <div class="card col-6">
+        <div class="card-title"><span class="card-title-icon">🏫</span> Tipo de Instituição</div>
+        <div class="chart-wrap"><canvas id="cInst"></canvas></div>
+      </div>
+      <div class="card col-6">
+        <div class="card-title"><span class="card-title-icon">📅</span> Faixa Etária</div>
+        <div class="lollipop-list" id="lollipopIdade"></div>
+      </div>
+      <div class="card col-6">
+        <div class="card-title"><span class="card-title-icon">📍</span> Distribuição por Bairro</div>
+        <div class="hbar-list" id="hbarBairros"></div>
+      </div>
+      <div class="card col-12">
+        <div class="card-title"><span class="card-title-icon">📋</span> Frequência Mensal — Taxa de Presença</div>
+        <div id="freqMensal"></div>
+      </div>
+    `;
 
-function toggleMode() {
-  printMode = printMode === 'bw' ? 'color' : 'bw';
-  const page = document.getElementById('preview-page');
-  const btn  = document.getElementById('mode-toggle');
-  if (printMode === 'bw') {
-    page.classList.replace('color', 'bw');
-    btn.textContent = '🔲 Preto e Branco';
-  } else {
-    page.classList.replace('bw', 'color');
-    btn.textContent = '🎨 Colorido';
+    Chart.defaults.color = '#7A9E9F';
+
+    // 1. Polar Area — Alunos por Projeto
+    const projCanvas = document.getElementById('cProjeto');
+    const projChart = new Chart(projCanvas, {
+      type: 'polarArea',
+      data: {
+        labels: d.por_projeto.map(p => cleanName(p.name)),
+        datasets: [{ data: d.por_projeto.map(p => p.value),
+          backgroundColor: [ORANGE+'CC', TEAL+'CC', ORANGE_L+'CC', TEAL_L+'CC'],
+          borderColor: [ORANGE, TEAL, ORANGE_L, TEAL_L], borderWidth: 1.5 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { r: { ticks: { display: false, backdropColor: 'transparent' }, grid: { color: 'rgba(30,62,64,.7)' } } },
+        plugins: {
+          legend: { position: 'right', labels: { color: '#9ABCBC', font: { size: 11 }, boxWidth: 12, padding: 10 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.r} (${pct(ctx.parsed.r, total)}%)` } }
+        },
+        animation: { onComplete: () => makeChartImg(projCanvas) }
+      }
+    });
+    chartInstances.push(projChart);
+
+    // 2. Polar Area — Tipo de Instituição
+    const instCanvas = document.getElementById('cInst');
+    const instChart = new Chart(instCanvas, {
+      type: 'polarArea',
+      data: {
+        labels: d.instituicao.map(i => i.name),
+        datasets: [{ data: d.instituicao.map(i => i.value),
+          backgroundColor: [TEAL+'CC', ORANGE+'CC', ORANGE_L+'CC'],
+          borderColor: [TEAL, ORANGE, ORANGE_L], borderWidth: 1.5 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { r: { ticks: { display: false, backdropColor: 'transparent' }, grid: { color: 'rgba(30,62,64,.7)' } } },
+        plugins: {
+          legend: { position: 'right', labels: { color: '#9ABCBC', font: { size: 11 }, boxWidth: 12, padding: 10 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.r} (${pct(ctx.parsed.r, total)}%)` } }
+        },
+        animation: { onComplete: () => makeChartImg(instCanvas) }
+      }
+    });
+    chartInstances.push(instChart);
+
+    // 3. Lollipop — Faixa Etária
+    const order  = ['Até 10', '11 – 14', '15 – 17', '18 – 24', '25 – 35', '36+'];
+    const sorted = order.map(n => d.idades.find(i => i.name === n) || { name: n, value: 0 });
+    const maxIdade = Math.max(...sorted.map(i => i.value)) || 1;
+    document.getElementById('lollipopIdade').innerHTML = sorted.map((it, i) => {
+      const w = Math.round(it.value / maxIdade * 100);
+      const color = PALETTE[i % PALETTE.length];
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="font-size:.75rem;color:var(--text);width:56px;text-align:right;flex-shrink:0">${it.name}</div>
+        <div style="flex:1;height:22px;position:relative">
+          <div style="position:absolute;top:50%;height:2px;transform:translateY(-50%);border-radius:2px;width:calc(${w}% - 11px);background:${color}44"></div>
+          <div style="position:absolute;top:50%;left:${w}%;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);background:${color};display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff">${it.value}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // 4. Horizontal Bar — Bairros
+    const bairros = [...d.bairros].sort((a, b) => b.value - a.value);
+    const maxB = bairros[0]?.value || 1;
+    document.getElementById('hbarBairros').innerHTML = bairros.map((b, i) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-size:.74rem;color:var(--text);width:90px;text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${b.name}">${b.name}</div>
+        <div style="flex:1;height:13px;background:rgba(30,62,64,.8);border-radius:4px;overflow:hidden">
+          <div style="height:100%;border-radius:4px;width:${Math.round(b.value/maxB*100)}%;background:${PALETTE[i%PALETTE.length]};transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+        </div>
+        <div style="font-size:.7rem;color:var(--muted);width:22px;flex-shrink:0">${b.value}</div>
+      </div>`).join('');
+
+    // 5. Frequência mensal
+    const MESES_PT = { '01':'Jan','02':'Fev','03':'Mar','04':'Abr','05':'Mai','06':'Jun','07':'Jul','08':'Ago','09':'Set','10':'Out','11':'Nov','12':'Dez' };
+    const freqMensal = (d.frequencia?.mensal ?? []).filter(m => m.total_registros > 0);
+    document.getElementById('freqMensal').innerHTML = freqMensal.map((m, i) => {
+      const label = MESES_PT[m.mes.slice(5)] || m.mes;
+      const pctVal = m.percentual_presenca;
+      const color = PALETTE[i % PALETTE.length];
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="font-size:.75rem;color:var(--text);width:32px;text-align:right;flex-shrink:0;font-weight:600">${label}</div>
+        <div style="flex:1;height:14px;background:rgba(30,62,64,.8);border-radius:4px;overflow:hidden">
+          <div style="height:100%;border-radius:4px;width:${pctVal}%;background:${color};transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+        </div>
+        <div style="font-size:.74rem;color:var(--text);width:44px;flex-shrink:0;font-weight:700">${pctVal.toFixed(1).replace('.',',')}%</div>
+        <div style="font-size:.68rem;color:var(--muted);width:100px;flex-shrink:0">${m.total_presencas.toLocaleString('pt-BR')} / ${m.total_registros.toLocaleString('pt-BR')} reg.</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    applyTweaks();
+    setupAutoRefresh();
+
+  } catch (err) {
+    document.getElementById('loading').innerHTML = `<p style="color:var(--orange)">Erro ao carregar: ${err.message}</p>`;
   }
 }
 
+loadData();
+
+// ── PRINT ──
 function printDashboard() {
-  const page = document.getElementById('preview-page');
-
-  // Captura imagens dos canvas
   const chartImgs = {};
-  document.querySelectorAll('canvas').forEach(c => {
-    chartImgs[c.id] = c.toDataURL('image/png');
-  });
+  document.querySelectorAll('canvas').forEach(c => { chartImgs[c.id] = c.toDataURL('image/png'); });
 
-  // Lê os KPIs do DOM
-  const kpiEls = document.querySelectorAll('#kpis .kpi');
+  const kpiEls  = document.querySelectorAll('#kpis .kpi');
   const kpisHtml = [...kpiEls].map(k => `
-    <div class="p-kpi">
-      <span class="p-icon">${k.querySelector('.icon')?.textContent || ''}</span>
-      <div class="p-label">${k.querySelector('.label')?.textContent || ''}</div>
-      <div class="p-value">${k.querySelector('.value')?.innerHTML || ''}</div>
-      <div class="p-sub">${k.querySelector('.sub')?.textContent || ''}</div>
+    <div class="pk">
+      <span class="pi">${k.querySelector('.icon')?.textContent || ''}</span>
+      <div class="pl">${k.querySelector('.label')?.textContent || ''}</div>
+      <div class="pv">${k.querySelector('.value')?.textContent || ''}</div>
+      <div class="pb">${k.querySelector('.sub')?.textContent || ''}</div>
     </div>`).join('');
 
-  // Bairros
-  const bairroEls = document.querySelectorAll('#bairroList .bar-item');
+  const bairroEls  = document.querySelectorAll('#bairroList .bar-item');
   const bairrosHtml = [...bairroEls].map(b => {
     const fill = b.querySelector('.bar-fill');
     return `
-    <div class="p-bar-item">
-      <div class="p-bar-header">
-        <span>${b.querySelector('.bar-header span')?.textContent || ''}</span>
-        <span>${b.querySelector('.bar-count')?.textContent || ''}</span>
-      </div>
-      <div class="p-bar-track">
-        <div class="p-bar-fill" style="width:${fill?.style.width || '0%'}"></div>
-      </div>
+    <div class="pbi">
+      <div class="pbh"><span>${b.querySelector('.bar-header span')?.textContent || ''}</span><span>${b.querySelector('.bar-count')?.textContent || ''}</span></div>
+      <div class="pbt"><div class="pbf" style="width:${fill?.style.width||'0%'};background:${fill?.style.background||'#C87830'}"></div></div>
     </div>`;
   }).join('');
 
-  const logoSrc = document.querySelector('.logo-wrap img')?.src || '';
-  const timestamp = document.getElementById('timestamp')?.textContent || '';
+  const logoSrc = document.getElementById('logo-img')?.src || '';
+  const ts = document.getElementById('timestamp')?.textContent || '';
 
-  page.innerHTML = `
-    <div class="preview-header">
+  document.getElementById('preview-page').innerHTML = `
+    <div class="ph">
       <img src="${logoSrc}" alt="Logo" />
-      <div>
-        <strong>Painel de Alunos</strong>
-        <small>Dados em tempo real · ${timestamp}</small>
-      </div>
+      <div><strong>Painel de Alunos</strong><small>Dados em tempo real · ${ts}</small></div>
     </div>
-
-    <div class="p-section">Indicadores principais</div>
-    <div class="p-kpis">${kpisHtml}</div>
-
-    <div class="p-section">Análises detalhadas</div>
-    <div class="p-charts">
-      <div class="p-card"><h3>📊 Alunos por Projeto</h3>${chartImgs.cProjeto ? `<img src="${chartImgs.cProjeto}">` : ''}</div>
-      <div class="p-card"><h3>🏫 Tipo de Instituição</h3>${chartImgs.cInst ? `<img src="${chartImgs.cInst}">` : ''}</div>
-      <div class="p-card"><h3>📅 Faixa Etária</h3>${chartImgs.cIdade ? `<img src="${chartImgs.cIdade}">` : ''}</div>
-      <div class="p-card"><h3>📍 Distribuição por Bairro</h3>${bairrosHtml}</div>
+    <div class="ps">Indicadores principais</div>
+    <div class="pk-grid">${kpisHtml}</div>
+    <div class="ps">Análises detalhadas</div>
+    <div class="pc-grid">
+      <div class="pc"><h3>📊 Alunos por Projeto</h3>${chartImgs.cProjeto ? `<img src="${chartImgs.cProjeto}">` : ''}</div>
+      <div class="pc"><h3>🏫 Tipo de Instituição</h3>${chartImgs.cInst ? `<img src="${chartImgs.cInst}">` : ''}</div>
+      <div class="pc"><h3>📅 Faixa Etária</h3>${chartImgs.cIdade ? `<img src="${chartImgs.cIdade}">` : ''}</div>
+      <div class="pc"><h3>📍 Distribuição por Bairro</h3>${bairrosHtml}</div>
     </div>
-
-    <div class="p-footer">EcoBúzios — Fonte: public-stats-api</div>
+    <div class="pfoot">EcoBúzios — Fonte: public-stats-api</div>
   `;
-
-  printMode = 'bw';
-  page.className = 'preview-page bw';
-  document.getElementById('mode-toggle').textContent = '🔲 Preto e Branco';
-
-  _focusBeforeModal = document.activeElement;
-  const modal = document.getElementById('preview-modal');
-  modal.classList.add('open');
-  const firstBtn = modal.querySelector('button');
-  if (firstBtn) firstBtn.focus();
+  document.getElementById('preview-modal').classList.add('open');
 }
-
-function closePreview() {
-  document.getElementById('preview-modal').classList.remove('open');
-  if (_focusBeforeModal) { _focusBeforeModal.focus(); _focusBeforeModal = null; }
-}
-
-const _PRINT_BASE = `
-  @page { size: A4 portrait; margin: 10mm 10mm; }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  body { font-family: 'Inter', sans-serif; background: #fff; color: #111; }
-  .preview-header { border-radius: 6px; padding: 8px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-  .preview-header img { height: 34px; border-radius: 4px; }
-  .preview-header strong { font-size: 0.85rem; display: block; }
-  .preview-header small { font-size: 0.72rem; }
-  .p-section { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom-width: 2px; border-bottom-style: solid; padding-bottom: 4px; margin-bottom: 8px; }
-  .p-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
-  .p-kpi { border-radius: 6px; padding: 7px 9px; border-width: 1px; border-style: solid; }
-  .p-icon { font-size: 1rem; margin-bottom: 4px; display: block; }
-  .p-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin-bottom: 3px; }
-  .p-value { font-size: 1.3rem; font-weight: 800; color: #000; line-height: 1; }
-  .p-sub { font-size: 0.62rem; margin-top: 3px; }
-  .p-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .p-card { border-radius: 6px; padding: 8px; break-inside: avoid; border-width: 1px; border-style: solid; }
-  .p-card h3 { font-size: 0.6rem; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; font-weight: 700; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
-  .p-card img { width: 100%; height: auto; display: block; max-height: 118px; object-fit: contain; }
-  .p-bar-item { margin-bottom: 5px; }
-  .p-bar-header { display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 2px; font-weight: 600; }
-  .p-bar-track { border-radius: 3px; height: 8px; overflow: hidden; }
-  .p-bar-fill { height: 100%; border-radius: 2px; }
-  .p-footer { text-align: center; font-size: 0.58rem; margin-top: 10px; padding-top: 8px; border-top: 1px solid #ccc; }
-`;
-const _PRINT_BW = _PRINT_BASE + `
-  .preview-header { background: #111; }
-  .preview-header img { filter: brightness(0) invert(1); }
-  .preview-header strong { color: #fff; }
-  .preview-header small { color: #ccc; }
-  .p-section { color: #111; border-bottom-color: #111; }
-  .p-kpi { background: #f0f0f0; border-color: #888; }
-  .p-label { color: #333; }
-  .p-sub { color: #444; }
-  .p-card { background: #fff; border-color: #888; }
-  .p-card h3 { color: #333; }
-  .p-card img { filter: grayscale(1); }
-  .p-bar-header { color: #111; }
-  .p-bar-track { background: #ddd; border: 1px solid #bbb; }
-  .p-bar-fill { background: #333; }
-  .p-footer { color: #555; }
-`;
-const _PRINT_COLOR = _PRINT_BASE + `
-  .preview-header { background: #0D3A3D; }
-  .preview-header strong { color: #fff; }
-  .preview-header small { color: #ccc; }
-  .p-section { color: #C87830; border-bottom-color: #ddd; border-bottom-width: 1px; }
-  .p-kpi { background: #eef4f4; border-color: #b0cece; }
-  .p-label { color: #666; }
-  .p-sub { color: #777; }
-  .p-card { background: #f9fafb; border-color: #ddd; }
-  .p-card h3 { color: #666; }
-  .p-bar-header { color: #333; }
-  .p-bar-track { background: #e0ecec; }
-  .p-bar-fill { background: #C87830; }
-  .p-footer { color: #999; }
-`;
-
-function doPrint(forceMode) {
-  const mode = forceMode || printMode;
-  const pageHTML = document.getElementById('preview-page').innerHTML;
-  const css = mode === 'bw' ? _PRINT_BW : _PRINT_COLOR;
-
+function closePreview() { document.getElementById('preview-modal').classList.remove('open'); }
+function doPrint() {
+  const html = document.getElementById('preview-page').innerHTML;
   const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>EcoBúzios — Painel de Alunos</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>${css}</style>
-</head>
-<body>${pageHTML}</body>
-</html>`);
+  win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+    <title>EcoBúzios — Painel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      @page{size:A4 portrait;margin:15mm 12mm}*{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Inter',sans-serif;background:#fff;padding:15mm 12mm}
+      .ph{background:#0D3A3D;border-radius:8px;padding:12px 20px;display:flex;align-items:center;gap:16px;margin-bottom:16px}
+      .ph img{height:48px;border-radius:6px}.ph strong{color:#fff;font-size:.95rem;display:block}.ph small{color:#ccc;font-size:.78rem}
+      .ps{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#C87830;border-bottom:1px solid #ddd;padding-bottom:6px;margin-bottom:12px}
+      .pk-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px}
+      .pk{background:#eef4f4;border:1px solid #b0cece;border-radius:8px;padding:10px}
+      .pi{font-size:1rem;margin-bottom:4px;display:block}.pl{font-size:.57rem;text-transform:uppercase;letter-spacing:.5px;color:#666;font-weight:600;margin-bottom:3px}
+      .pv{font-size:1.3rem;font-weight:800;color:#111;line-height:1}.pb{font-size:.64rem;color:#777;margin-top:3px}
+      .pc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+      .pc{background:#f9fafb;border:1px solid #ddd;border-radius:8px;padding:12px;break-inside:avoid}
+      .pc h3{font-size:.62rem;text-transform:uppercase;letter-spacing:.5px;color:#666;margin-bottom:8px;font-weight:700}
+      .pc img{width:100%;height:auto;display:block}
+      .pbi{margin-bottom:7px}.pbh{display:flex;justify-content:space-between;font-size:.72rem;color:#333;margin-bottom:3px}
+      .pbt{background:#e0ecec;border-radius:4px;height:6px;overflow:hidden}.pbf{height:100%;border-radius:4px}
+      .pfoot{text-align:center;font-size:.6rem;color:#999;margin-top:16px;padding-top:10px;border-top:1px solid #eee}
+    </style></head><body>${html}</body></html>`);
   win.document.close();
   win.addEventListener('load', () => { win.focus(); win.print(); });
 }
