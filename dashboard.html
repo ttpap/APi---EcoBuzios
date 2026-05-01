@@ -697,7 +697,7 @@ async function silentRefresh() {
     const pctPub = pct((d.instituicao.find(i => i.name === 'Pública') || { value: 0 }).value, total);
     const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
     const totalReunioes = d.reunioes?.total ?? 0;
-    const totalRelatorios = d.horas_aula?.total_relatorios_enviados ?? 0;
+    const totalRelatorios = (d.horas_aula?.total_relatorios_enviados ?? 0) + (d.horas_aula?.total_prestacao_contas ?? 0);
     const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
     const totalAulas = totalAulasPuras + totalReunioes + totalRelatorios;
     const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + (d.horas_aula?.total_horas ?? 0);
@@ -726,7 +726,7 @@ async function loadData(url = API_BASE) {
     const pctPub = pct((d.instituicao.find(i => i.name === 'Pública') || { value: 0 }).value, total);
     const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
     const totalReunioes   = d.reunioes?.total ?? 0;
-    const totalRelatorios = d.horas_aula?.total_relatorios_enviados ?? 0;
+    const totalRelatorios = (d.horas_aula?.total_relatorios_enviados ?? 0) + (d.horas_aula?.total_prestacao_contas ?? 0);
     const totalHorasReunioes = d.reunioes?.total_horas ?? 0;
     const totalAulas = totalAulasPuras + totalReunioes + totalRelatorios;
     const totalHoras = (d.frequencia?.total_horas_ano ?? 0) + totalHorasReunioes + (d.horas_aula?.total_horas ?? 0);
