@@ -735,7 +735,7 @@ async function loadData(url = API_BASE) {
 
     const kpiData = [
       { icon: '🎓', label: 'Total de Alunos', value: total, sub: 'em turmas ativas', accent: TEAL, animate: true },
-      { icon: '📚', label: 'Aulas no Ano',    value: totalHoras, valueSub: `/ ${totalAulas} aulas`, suffix: 'h', sub: `horas realizadas em ${d.frequencia?.ano ?? ''}`, accent: ORANGE, animate: true },
+      { icon: '📚', label: 'Aulas no Projeto', value: totalHoras, valueSub: `/ ${totalAulas} aulas`, suffix: 'h', sub: 'horas realizadas no projeto', accent: ORANGE, animate: true },
       { icon: '📍', label: 'Bairros',         value: d.bairros.length, sub: 'regiões atendidas', accent: TEAL_L, animate: true },
       { icon: '🏫', label: 'Escola Pública',  value: pctPub, suffix: '%', sub: 'dos alunos matriculados', accent: ORANGE_L, animate: true },
       { icon: '🤝', label: 'Reuniões',        value: totalHorasReunioes, valueSub: `/ ${totalReunioes} reuniões`, suffix: 'h', sub: 'horas de reunião registradas', accent: TEAL, animate: true },
