@@ -694,7 +694,7 @@ async function silentRefresh() {
     const d = await fetch(url, { headers: { 'x-api-key': API_KEY } }).then(r => r.json());
     if (!d.ok) return;
     const total = d.total_alunos_em_turmas;
-    const pctPub = pct((d.instituicao.find(i => i.name === 'Pública') || { value: 0 }).value, total);
+    const pctPub = pct((d.instituicao.find(i => i.name === 'Públicas') || { value: 0 }).value, total);
     const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
     const totalReunioes = d.reunioes?.total ?? 0;
     const totalRelatorios = (d.horas_aula?.total_relatorios_enviados ?? 0) + (d.horas_aula?.total_prestacao_contas ?? 0);
@@ -723,7 +723,7 @@ async function loadData(url = API_BASE) {
     if (d.projetos_lista) renderProjectButtons(d.projetos_lista);
 
     const total = d.total_alunos_em_turmas;
-    const pctPub = pct((d.instituicao.find(i => i.name === 'Pública') || { value: 0 }).value, total);
+    const pctPub = pct((d.instituicao.find(i => i.name === 'Públicas') || { value: 0 }).value, total);
     const totalAulasPuras = d.frequencia?.total_aulas_ano ?? 0;
     const totalReunioes   = d.reunioes?.total ?? 0;
     const totalRelatorios = (d.horas_aula?.total_relatorios_enviados ?? 0) + (d.horas_aula?.total_prestacao_contas ?? 0);
@@ -737,7 +737,7 @@ async function loadData(url = API_BASE) {
       { icon: '🎓', label: 'Total de Alunos', value: total, sub: 'em turmas ativas', accent: TEAL, animate: true },
       { icon: '📚', label: 'Aulas no Projeto', value: totalHoras, valueSub: `/ ${totalAulas} aulas`, suffix: 'h', sub: 'horas realizadas no projeto', accent: ORANGE, animate: true },
       { icon: '📍', label: 'Bairros',         value: d.bairros.length, sub: 'regiões atendidas', accent: TEAL_L, animate: true },
-      { icon: '🏫', label: 'Escola Pública',  value: pctPub, suffix: '%', sub: 'dos alunos matriculados', accent: ORANGE_L, animate: true },
+      { icon: '🏫', label: 'Públicas',  value: pctPub, suffix: '%', sub: 'dos alunos matriculados', accent: ORANGE_L, animate: true },
       { icon: '🤝', label: 'Reuniões',        value: totalHorasReunioes, valueSub: `/ ${totalReunioes} reuniões`, suffix: 'h', sub: 'horas de reunião registradas', accent: TEAL, animate: true },
       { icon: '📋', label: 'Taxa de Frequência', value: taxaFreq, suffix: '%', sub: `${(d.frequencia?.anual?.total_presencas ?? 0).toLocaleString('pt-BR')} presenças registradas`, accent: '#3AACB4', animate: true },
     ];
