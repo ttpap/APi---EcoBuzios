@@ -600,6 +600,18 @@ const API_KEY  = 'c04248b422b59e718e8115a66286b1f9a56f5f447b44354128ad7406ebb507
 const ORANGE   = '#C87830', ORANGE_L = '#E8944A';
 const TEAL     = '#1E6B70', TEAL_L   = '#2A8E95';
 const PALETTE  = ['#C87830','#1E6B70','#E8944A','#2A8E95','#A05A20','#3AACB4','#F0A860','#5ECDD3','#7A4A1A','#144C50','#D4A060','#0D3A3D'];
+const GENERO_ORDEM = ['Mulher cis','Homem cis','Mulher trans','Homem trans','Não-binário','Outro','Não informado'];
+const GENERO_CORES = {
+  'Mulher cis': '#C87830', 'Homem cis': '#1E6B70', 'Mulher trans': '#E8944A',
+  'Homem trans': '#2A8E95', 'Não-binário': '#A05A20', 'Outro': '#3AACB4', 'Não informado': '#7A9E9F',
+};
+function generoRows(d) {
+  const lista = d.generos?.generos ?? [];
+  return [...lista].sort((a, b) => {
+    const ia = GENERO_ORDEM.indexOf(a.name), ib = GENERO_ORDEM.indexOf(b.name);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  });
+}
 
 let activeProjectId = '';
 let chartInstances  = [];
@@ -776,6 +788,10 @@ async function loadData(url = API_BASE) {
         <div class="lollipop-list" id="lollipopIdade"></div>
       </div>
       <div class="card col-6">
+        <div class="card-title"><span class="card-title-icon">⚧️</span> Gênero</div>
+        <div class="hbar-list" id="hbarGenero"></div>
+      </div>
+      <div class="card col-12">
         <div class="card-title"><span class="card-title-icon">📍</span> Distribuição por Bairro</div>
         <div class="hbar-list" id="hbarBairros"></div>
       </div>
@@ -859,6 +875,20 @@ async function loadData(url = API_BASE) {
         <div style="font-size:.7rem;color:var(--muted);width:22px;flex-shrink:0">${b.value}</div>
       </div>`).join('');
 
+    // 4b. Gênero
+    const generos = generoRows(d);
+    const totalGen = d.generos?.total || generos.reduce((s, g) => s + g.value, 0) || 1;
+    const maxG = Math.max(...generos.map(g => g.value), 1);
+    document.getElementById('hbarGenero').innerHTML = generos.length ? generos.map(g => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="font-size:.74rem;color:var(--text);width:90px;text-align:right;flex-shrink:0;white-space:nowrap">${g.name}</div>
+        <div style="flex:1;height:14px;background:rgba(30,62,64,.8);border-radius:4px;overflow:hidden">
+          <div style="height:100%;border-radius:4px;width:${Math.round(g.value/maxG*100)}%;background:${GENERO_CORES[g.name] || '#7A9E9F'};transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+        </div>
+        <div style="font-size:.72rem;color:var(--text);width:30px;flex-shrink:0;font-weight:700;text-align:right">${g.value}</div>
+        <div style="font-size:.68rem;color:var(--muted);width:36px;flex-shrink:0">${pct(g.value, totalGen)}%</div>
+      </div>`).join('') : '<div style="font-size:.75rem;color:var(--muted)">Sem dados de gênero.</div>';
+
     // 5. Frequência mensal
     const MESES_PT = { '01':'Jan','02':'Fev','03':'Mar','04':'Abr','05':'Mai','06':'Jun','07':'Jul','08':'Ago','09':'Set','10':'Out','11':'Nov','12':'Dez' };
     const freqMensal = (d.frequencia?.mensal ?? []).filter(m => m.total_registros > 0);
@@ -939,13 +969,27 @@ function buildPrintCharts(d) {
     </div>`;
   }).join('');
 
-  return { imgs, idadeHtml, bairroHtml, freqHtml };
+  // Gênero
+  const generos = generoRows(d);
+  const totalGen = d.generos?.total || generos.reduce((s, g) => s + g.value, 0) || 1;
+  const maxG = Math.max(...generos.map(g => g.value), 1);
+  const generoHtml = generos.map(g => `
+    <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">
+      <div style="font-size:.58rem;color:#333;width:62px;text-align:right;flex-shrink:0;white-space:nowrap">${g.name}</div>
+      <div style="flex:1;height:10px;background:#e4eded;border-radius:3px;overflow:hidden">
+        <div style="height:100%;border-radius:3px;width:${Math.round(g.value/maxG*100)}%;background:${GENERO_CORES[g.name] || '#7A9E9F'}"></div>
+      </div>
+      <div style="font-size:.58rem;color:#222;width:20px;flex-shrink:0;font-weight:700;text-align:right">${g.value}</div>
+      <div style="font-size:.55rem;color:#777;width:26px;flex-shrink:0">${pct(g.value, totalGen)}%</div>
+    </div>`).join('');
+
+  return { imgs, idadeHtml, bairroHtml, freqHtml, generoHtml };
 }
 
 function printDashboard() {
   if (!lastData) return;
   const d = lastData;
-  const { imgs, idadeHtml, bairroHtml, freqHtml } = buildPrintCharts(d);
+  const { imgs, idadeHtml, bairroHtml, freqHtml, generoHtml } = buildPrintCharts(d);
 
   const kpisHtml = [...document.querySelectorAll('#kpis .kpi')].map(k=>`
     <div class="pk">
@@ -971,7 +1015,8 @@ function printDashboard() {
       <div class="pc"><h3>🏫 Tipo de Instituição</h3>${imgs.cInst?`<img src="${imgs.cInst}">`:''}</div>
       <div class="pc"><h3>📋 Frequência Mensal</h3>${freqHtml}</div>
       <div class="pc"><h3>📅 Faixa Etária</h3>${idadeHtml}</div>
-      <div class="pc pc-wide"><h3>📍 Distribuição por Bairro</h3>${bairroHtml}</div>
+      <div class="pc pc-wide"><h3>⚧️ Gênero</h3>${generoHtml}</div>
+      <div class="pc" style="grid-column:span 3"><h3>📍 Distribuição por Bairro</h3>${bairroHtml}</div>
     </div>
     <div class="pfoot">EcoBúzios — Fonte: public-stats-api · ${ts}</div>
   `;
