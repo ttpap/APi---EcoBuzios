@@ -605,6 +605,19 @@ const GENERO_CORES = {
   'Mulher cis': '#C87830', 'Homem cis': '#1E6B70', 'Mulher trans': '#E8944A',
   'Homem trans': '#2A8E95', 'Não-binário': '#A05A20', 'Outro': '#3AACB4', 'Não informado': '#7A9E9F',
 };
+function generoResumo(d) {
+  let mulheres = 0, homens = 0, outros = 0;
+  for (const g of (d.generos?.generos ?? [])) {
+    if (g.name.startsWith('Mulher')) mulheres += g.value;
+    else if (g.name.startsWith('Homem')) homens += g.value;
+    else outros += g.value;
+  }
+  const total = d.generos?.total || (mulheres + homens + outros);
+  return { mulheres, homens, outros, total, pctMulheres: pct(mulheres, total) };
+}
+function generoSub(r) {
+  return `${r.mulheres} mulheres · ${r.homens} homens · ${r.outros} outros`;
+}
 function generoRows(d) {
   const lista = d.generos?.generos ?? [];
   return [...lista].sort((a, b) => {
@@ -720,6 +733,12 @@ async function silentRefresh() {
     if (vals[3]) vals[3].textContent = pctPub + '%';
     if (vals[4]) vals[4].innerHTML = `${totalHorasReunioes}h <span style="font-size:1rem;opacity:.5;font-weight:500">/ ${totalReunioes} reuniões</span>`;
     if (vals[5]) vals[5].textContent = (d.frequencia?.anual?.percentual_presenca ?? 0).toFixed(1).replace('.', ',');
+    if (vals[6]) {
+      const gen = generoResumo(d);
+      vals[6].innerHTML = `${gen.pctMulheres}% <span style="font-size:.9rem;opacity:.45;font-weight:500;margin-left:4px">mulheres</span>`;
+      const sub = vals[6].parentNode.querySelector('.sub');
+      if (sub) sub.textContent = generoSub(gen);
+    }
     document.getElementById('timestamp').textContent = fmtDate(d.gerado_em);
   } catch (_) {}
 }
@@ -753,6 +772,10 @@ async function loadData(url = API_BASE) {
       { icon: '🤝', label: 'Reuniões',        value: totalHorasReunioes, valueSub: `/ ${totalReunioes} reuniões`, suffix: 'h', sub: 'horas de reunião registradas', accent: TEAL, animate: true },
       { icon: '📋', label: 'Taxa de Frequência', value: taxaFreq, suffix: '%', sub: `${(d.frequencia?.anual?.total_presencas ?? 0).toLocaleString('pt-BR')} presenças registradas`, accent: '#3AACB4', animate: true },
     ];
+    const gen = generoResumo(d);
+    if (gen.total) {
+      kpiData.push({ icon: '⚧️', label: 'Gênero', value: gen.pctMulheres, suffix: '%', valueSub: 'mulheres', sub: generoSub(gen), accent: ORANGE, animate: true });
+    }
 
     document.getElementById('kpis').innerHTML = kpiData.map((k, i) => `
       <div class="kpi" style="--kpi-accent:${k.accent}; animation-delay:${i * 0.06}s">
@@ -1052,7 +1075,7 @@ function doPrint() {
       .ph{background:#0D3A3D;border-radius:6px;padding:8px 16px;display:flex;align-items:center;gap:14px;margin-bottom:10px}
       .ph img{height:38px;border-radius:4px}.ph strong{color:#fff;font-size:.85rem;display:block}.ph small{color:#aedde0;font-size:.68rem}
       .ps{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#C87830;border-bottom:1px solid #e5e5e5;padding-bottom:4px;margin-bottom:8px}
-      .pk-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px}
+      .pk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
       .pk{background:#eef5f5;border:1px solid #c0d8d9;border-radius:6px;padding:7px 8px}
       .pi{font-size:.85rem;margin-bottom:2px;display:block}.pl{font-size:.5rem;text-transform:uppercase;letter-spacing:.4px;color:#555;font-weight:700;margin-bottom:2px}
       .pv{font-size:1.05rem;font-weight:800;color:#111;line-height:1.1}.pb{font-size:.52rem;color:#777;margin-top:2px}
